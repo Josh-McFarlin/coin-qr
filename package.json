@@ -1,0 +1,66 @@
+{
+  "name": "crypto-qr",
+  "description": "Generate a single QR code to receive payments in multiple cryptocurrencies",
+  "version": "0.1.0",
+  "author": "Josh McFarlin",
+  "license": "MIT",
+  "private": false,
+  "homepage": "https://github.com/josh-mcfarlin/crypto-qr",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josh-mcfarlin/crypto-qr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/josh-mcfarlin/crypto-qr/issues"
+  },
+  "dependencies": {
+    "@zeit/next-css": "^1.0.1",
+    "bootstrap-css-only": "^4.3.1",
+    "classnames": "^2.2.6",
+    "cryptocurrency-icons": "^0.11.0",
+    "express": "^4.16.4",
+    "firebase": "^5.9.1",
+    "hashids": "^1.2.2",
+    "helmet": "^3.17.0",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
+    "next": "^8.0.3",
+    "next-images": "^1.1.1",
+    "next-redux-wrapper": "^3.0.0-alpha.2",
+    "next-routes": "^1.4.2",
+    "prop-types": "^15.7.2",
+    "qrcode.react": "^0.9.3",
+    "react": "^16.8.4",
+    "react-beautiful-dnd": "^10.1.0",
+    "react-device-detect": "^1.6.2",
+    "react-dom": "^16.8.4",
+    "react-firebaseui": "^3.1.2",
+    "react-jss": "^8.6.1",
+    "react-redux": "^6.0.1",
+    "react-select": "^2.4.2",
+    "redux": "^4.0.1",
+    "redux-persist": "^5.10.0",
+    "redux-thunk": "^2.3.0",
+    "shards-react": "^1.0.3",
+    "shards-ui": "^2.1.2",
+    "short-hash": "^1.0.0",
+    "shortid": "^2.2.14",
+    "shortid-extend": "0.0.3"
+  },
+  "scripts": {
+    "dev": "node server.js",
+    "build": "next build",
+    "now-build": "next build",
+    "dev-prod": "NODE_ENV=production npm run build && node server.js",
+    "start": "NODE_ENV=production node server.js",
+    "export": "npm run build && next export"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.15.3",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4"
+  }
+}

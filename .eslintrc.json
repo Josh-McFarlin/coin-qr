@@ -1,0 +1,44 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "es6": true,
+    "commonjs": true
+  },
+  "extends": "airbnb",
+  "parserOptions": {
+    "ecmaVersion": 9,
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "object-curly-spacing": ["error", "always"],
+    "indent": ["error", 4, { "SwitchCase": 1 }],
+    "object-curly-newline": ["error", { "consistent": true }],
+    "global-require": "off",
+    "react/jsx-filename-extension": "off",
+    "react/jsx-wrap-multilines": "off",
+    "react/jsx-indent": ["error", 4],
+    "react/jsx-indent-props": ["error", 4],
+    "comma-dangle": ["error", "never"],
+    "import/newline-after-import": ["error", { "count": 2 }],
+    "react/jsx-tag-spacing": "error",
+    "react/prefer-stateless-function": "off",
+    "no-trailing-spaces": "off",
+    "react/forbid-prop-types": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "max-len": "off",
+    "jsx-quotes": ["error", "prefer-single"],
+    "prefer-promise-reject-errors": "off",
+    "operator-linebreak": ["error", "before", { "overrides": { "?": "after", ":": "after", "=": "after" } }],
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "arrow-parens": ["error", "always"],
+    "implicit-arrow-linebreak": "off",
+    "no-unused-vars": ["error", { "args": "none" }]
+  }
+}
