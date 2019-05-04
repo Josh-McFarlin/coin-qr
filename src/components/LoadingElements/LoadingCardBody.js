@@ -6,6 +6,9 @@ import { CardBody } from 'shards-react';
 
 
 const styles = () => ({
+    card: {
+
+    },
     loading: {
         display: 'flex',
         justifyContent: 'center',
@@ -19,7 +22,7 @@ class LoadingCardBody extends React.PureComponent {
         const { classes, className, isLoading, children } = this.props;
 
         return (
-            <CardBody className={classNames(className, { [classes.loading]: isLoading })}>
+            <CardBody className={classNames(className, classes.card, { [classes.loading]: isLoading })}>
                 {isLoading ? (
                     <div className='spinner-border' role='status'>
                         <span className='sr-only'>Loading...</span>

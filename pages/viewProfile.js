@@ -5,16 +5,17 @@ import { withRouter } from 'next/router';
 import _ from 'lodash';
 import { Card, CardHeader, Row, Col, ListGroup } from 'shards-react';
 import { connect } from 'react-redux';
-import Hashids from 'hashids';
 import { isMobile } from 'react-device-detect';
 import shortHash from 'short-hash';
 
 import Error from './_error';
+import firebase from '../src/firebase';
 import { fetchProfile, fetchRecent, fetchPage } from '../src/redux/actions';
 import { FETCH_PROFILE_FAILURE } from '../src/redux/actions/profiles/types';
 import AddressListViewer from '../src/components/AddressList/AddressListViewer';
 import PageSection from '../src/components/PageSection/PageSection';
 import LoadingCardBody from '../src/components/LoadingElements/LoadingCardBody';
+import noProfilePic from '../static/images/noProfilePic.png';
 
 
 const styles = () => ({
@@ -46,6 +47,9 @@ const styles = () => ({
     },
     profilePicture: {
         width: '100%',
+        maxWidth: 150,
+        marginLeft: 'auto',
+        marginRight: 'auto',
         borderRadius: '50%'
     },
     scrollBody: {
@@ -67,57 +71,78 @@ class ProfilePage extends React.PureComponent {
     }
 
     componentDidMount() {
-        const { dispatch, user, router } = this.props;
+        const { dispatch, router } = this.props;
 
-        let profileId = _.get(router, 'query.id');
-        const userId = _.get(user, 'uid');
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                let profileId = _.get(router, 'query.id');
+                const userId = _.get(user, 'uid');
 
-        console.log('userId', userId)
+                if (_.isNil(profileId) && _.isString(userId)) {
+                    profileId = shortHash(userId);
+                }
 
-        if (_.isNil(profileId) && _.isString(userId)) {
-            profileId = shortHash(userId);
+                if (_.isString(userId)) {
+                    dispatch(fetchRecent(userId));
+                }
 
-            console.log(shortHash(userId));
-        }
+                if (_.isString(profileId)) {
+                    dispatch(fetchProfile(profileId))
+                        .then(({ type, payload }) => {
+                            if (type === FETCH_PROFILE_FAILURE) {
+                                this.setState({
+                                    error: {
+                                        message: 'Profile Page Not Found',
+                                        statusCode: 404
+                                    }
+                                });
+                            }
 
-        if (_.isString(userId)) {
-            dispatch(fetchRecent(userId));
-        }
+                            return payload;
+                        })
+                        .then(({ profile }) => {
+                            const featured = _.get(profile, 'data.featuredPage.featuredPage');
 
-        if (_.isString(profileId)) {
-            dispatch(fetchProfile(profileId))
-                .then(({ type, payload }) => {
-                    if (type === FETCH_PROFILE_FAILURE) {
-                        this.setState({
-                            goToError: true
+                            if (_.isString(featured) && _.get(profile, 'data.featuredPage.public', false)) {
+                                dispatch(fetchPage(featured));
+                            }
+                        })
+                        .catch(() => {
+                            this.setState({
+                                error: {
+                                    message: 'Profile Page Not Found',
+                                    statusCode: 404
+                                }
+                            });
                         });
-                    }
-
-                    return payload;
-                })
-                .then(({ profile }) => {
-                    const featured = _.get(profile, 'data.featuredPage.featuredPage');
-
-                    if (_.isString(featured)) {
-                        dispatch(fetchPage(featured));
+                } else {
+                    this.setState({
+                        error: {
+                            message: 'Profile Page Not Found',
+                            statusCode: 404
+                        }
+                    });
+                }
+            } else {
+                this.setState({
+                    error: {
+                        message: 'You must be signed in before viewing your profile page!',
+                        statusCode: 400
                     }
                 });
-        } else {
-            this.setState({
-                goToError: true
-            });
-        }
+            }
+        });
     }
 
     render() {
         const { classes, profile, featuredPage, recentPages } = this.props;
-        const { goToError } = this.state;
+        const { error } = this.state;
 
-        if (goToError) {
+        if (_.isObject(error)) {
             return (
                 <Error
-                    statusCode={404}
-                    statusMessage='Profile Page Not Found'
+                    statusCode={error.statusCode}
+                    statusMessage={error.message}
                 />
             );
         }
@@ -130,26 +155,32 @@ class ProfilePage extends React.PureComponent {
                 <LoadingCardBody isLoading={_.isNil(profile)}>
                     <Row className={classes.rowNoPadding}>
                         <Col sm={2}>
-                            <Row>
-                                <Col className={classes.profileName}>
-                                    <b>
-                                        {_.get(profile, 'data.name.name')}
-                                    </b>
-                                </Col>
-                            </Row>
-                            <Row className={classes.rowNoPadding}>
-                                <Col>
-                                    <img
-                                        className={classes.profilePicture}
-                                        src={_.get(profile, 'data.picture.picture')}
-                                        alt='Profile'
-                                    />
-                                </Col>
-                            </Row>
+                            {_.get(profile, 'data.name.public', false) && (
+                                <Row>
+                                    <Col className={classes.profileName}>
+                                        <b>
+                                            {_.get(profile, 'data.name.name')}
+                                        </b>
+                                    </Col>
+                                </Row>
+                            )}
+                            {_.get(profile, 'data.picture.public', false) && (
+                                <Row className={classes.rowNoPadding}>
+                                    <Col>
+                                        <img
+                                            className={classes.profilePicture}
+                                            src={_.get(profile, 'data.picture.picture', noProfilePic)}
+                                            alt='Profile'
+                                        />
+                                    </Col>
+                                </Row>
+                            )}
                         </Col>
-                        <Col sm={10}>
-                            {_.get(profile, 'data.bio')}
-                        </Col>
+                        {_.get(profile, 'data.bio.public', false) && (
+                            <Col sm={10}>
+                                {_.get(profile, 'data.bio.bio')}
+                            </Col>
+                        )}
                     </Row>
                 </LoadingCardBody>
             </Card>
@@ -205,16 +236,20 @@ class ProfilePage extends React.PureComponent {
                                 {profileSection}
                             </Col>
                         </Row>
-                        <Row>
-                            <Col>
-                                {featuredSection}
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                {addressSection}
-                            </Col>
-                        </Row>
+                        {_.get(profile, 'data.featuredPage.public', false) && (
+                            <Row>
+                                <Col>
+                                    {featuredSection}
+                                </Col>
+                            </Row>
+                        )}
+                        {_.get(profile, 'data.addresses.public', false) && (
+                            <Row>
+                                <Col>
+                                    {addressSection}
+                                </Col>
+                            </Row>
+                        )}
                         <Row>
                             <Col>
                                 {otherSection}
@@ -234,18 +269,22 @@ class ProfilePage extends React.PureComponent {
                                 {profileSection}
                             </Col>
                         </Row>
-                        <Row className={classes.flexFill}>
-                            <Col>
-                                {addressSection}
-                            </Col>
-                        </Row>
+                        {_.get(profile, 'data.addresses.public', false) && (
+                            <Row className={classes.flexFill}>
+                                <Col>
+                                    {addressSection}
+                                </Col>
+                            </Row>
+                        )}
                     </Col>
                     <Col sm={4} className={`${classes.fullHeight} ${classes.flexColumn}`}>
-                        <Row>
-                            <Col>
-                                {featuredSection}
-                            </Col>
-                        </Row>
+                        {_.get(profile, 'data.featuredPage.public', false) && (
+                            <Row>
+                                <Col>
+                                    {featuredSection}
+                                </Col>
+                            </Row>
+                        )}
                         <Row className={classes.flexFill}>
                             <Col className={classes.fullHeight}>
                                 {otherSection}
@@ -261,7 +300,6 @@ class ProfilePage extends React.PureComponent {
 ProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
-    user: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
     profile: PropTypes.object,
     featuredPage: PropTypes.object,
@@ -269,7 +307,6 @@ ProfilePage.propTypes = {
 };
 
 ProfilePage.defaultProps = {
-    user: null,
     profile: null,
     featuredPage: null,
     recentPages: null
@@ -278,10 +315,9 @@ ProfilePage.defaultProps = {
 const styledPage = withRouter(withStyles(styles)(ProfilePage));
 
 export default connect((state) => {
-    const { auth, profiles, pages } = state;
+    const { profiles, pages } = state;
 
     return {
-        user: _.get(auth, 'user'),
         profile: _.get(profiles, 'profile'),
         featuredPage: _.get(pages, 'page'),
         recentPages: _.get(pages, 'recentPages')

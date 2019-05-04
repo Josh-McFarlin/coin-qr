@@ -6,6 +6,6 @@ module.exports = routes()
     .add('recent', '/recent')
     .add('auth', '/auth')
     .add('create', '/qr', 'edit')
-    .add('view', '/qr/:id')
-    .add('edit', '/qr/:id/edit')
-    .add('profile', '/profile/:id?');
+    .add('viewQR', '/qr/:id')
+    .add('editQR', '/qr/:id/edit')
+    .add('viewProfile', '/profile/:id?');

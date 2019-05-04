@@ -1,4 +1,5 @@
 import Hashids from 'hashids';
+import _ from 'lodash';
 
 import firebase from '../../../firebase/index';
 import {
@@ -20,8 +21,14 @@ export const fetchProfile = (id) => (dispatch) =>
             if (profile.exists) {
                 const data = profile.data();
 
-                data.created = data.created.toDate();
-                data.modified = data.modified.toDate();
+                if (!_.isNil(data.created)) {
+                    data.created = data.created.toDate();
+                }
+
+                if (!_.isNil(data.modified)) {
+                    data.modified = data.modified.toDate();
+                }
+
                 data.id = profile.id;
 
                 const payload = {
