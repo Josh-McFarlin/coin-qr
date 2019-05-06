@@ -24,9 +24,9 @@ picture {
 }
 
 .row {
-    padding-bottom: 0px;
+    padding-bottom: 0;
 }
 
 .row .row {
-    padding-bottom: 30px;
+    padding-bottom: 16px;
 }

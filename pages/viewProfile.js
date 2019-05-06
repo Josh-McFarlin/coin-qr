@@ -5,10 +5,8 @@ import { withRouter } from 'next/router';
 import _ from 'lodash';
 import { Card, CardHeader, Row, Col, ListGroup } from 'shards-react';
 import { isMobile } from 'react-device-detect';
-import shortHash from 'short-hash';
 
 import Error from './_error';
-import firebase from '../frontend/firebase';
 import { fetchProfile, fetchRecent, fetchPage } from '../frontend/firebase/actions';
 import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
 import PageSection from '../frontend/components/PageSection/PageSection';
@@ -60,81 +58,69 @@ const styles = () => ({
 });
 
 class ViewProfilePage extends React.PureComponent {
+    static async getInitialProps({ query, res }) {
+        const locals = _.get(res, 'locals', {});
+
+        console.log('locals2', locals);
+
+        return {
+            myUserId: locals.userId
+        };
+    }
+
     constructor(props) {
         super(props);
 
         this.state = {
-            error: null
+            error: null,
+            profile: null,
+            featuredPage: null,
+            recentPages: []
         };
     }
 
     componentDidMount() {
-        const { dispatch, router } = this.props;
+        const { router } = this.props;
+        const profileId = _.get(router, 'query.id');
 
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                let profileId = _.get(router, 'query.id');
-                const userId = _.get(user, 'uid');
+        fetchProfile(profileId)
+            .then((profile) => {
+                this.setState({
+                    profile
+                });
 
-                if (_.isNil(profileId) && _.isString(userId)) {
-                    profileId = shortHash(userId);
-                }
+                const featured = _.get(profile, 'data.featuredPage.featuredPage');
 
-                if (_.isString(userId)) {
-                    dispatch(fetchRecent(userId));
-                }
-
-                if (_.isString(profileId)) {
-                    dispatch(fetchProfile(profileId))
-                        .then(({ type, payload }) => {
-                            if (type === FETCH_PROFILE_FAILURE) {
-                                this.setState({
-                                    error: {
-                                        message: 'Profile Page Not Found',
-                                        statusCode: 404
-                                    }
-                                });
-                            }
-
-                            return payload;
-                        })
-                        .then(({ profile }) => {
-                            const featured = _.get(profile, 'data.featuredPage.featuredPage');
-
-                            if (_.isString(featured) && _.get(profile, 'data.featuredPage.public', false)) {
-                                dispatch(fetchPage(featured));
-                            }
-                        })
-                        .catch(() => {
+                if (_.isString(featured) && _.get(profile, 'data.featuredPage.public', false)) {
+                    fetchPage(featured)
+                        .then((featuredPage) => {
                             this.setState({
-                                error: {
-                                    message: 'Profile Page Not Found',
-                                    statusCode: 404
-                                }
+                                featuredPage
                             });
                         });
-                } else {
-                    this.setState({
-                        error: {
-                            message: 'Profile Page Not Found',
-                            statusCode: 404
-                        }
-                    });
                 }
-            } else {
+
+                fetchRecent(profile.userId)
+                    .then((recentPages) => {
+                        this.setState({
+                            recentPages
+                        });
+                    });
+            })
+            .catch(() => {
                 this.setState({
                     error: {
-                        message: 'You must be signed in before viewing your profile page!',
-                        statusCode: 400
+                        message: 'Profile Page Not Found',
+                        statusCode: 404
                     }
                 });
-            }
-        });
+            });
     }
 
+
     render() {
-        const { classes, profile, featuredPage, recentPages } = this.props;
-        const { error } = this.state;
+        const { classes } = this.props;
+        const { error, profile, featuredPage, recentPages } = this.state;
 
         if (_.isObject(error)) {
             return (
@@ -297,16 +283,7 @@ class ViewProfilePage extends React.PureComponent {
 
 ViewProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-    profile: PropTypes.object,
-    featuredPage: PropTypes.object,
-    recentPages: PropTypes.array
-};
-
-ViewProfilePage.defaultProps = {
-    profile: null,
-    featuredPage: null,
-    recentPages: null
+    router: PropTypes.object.isRequired
 };
 
 export default withRouter(withStyles(styles)(ViewProfilePage));

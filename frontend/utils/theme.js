@@ -9,6 +9,6 @@ export default {
         }
     },
     spacing: {
-        unit: 15
+        unit: 8
     }
 };

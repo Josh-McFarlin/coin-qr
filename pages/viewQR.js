@@ -51,36 +51,42 @@ const styles = (theme) => ({
 });
 
 class ViewPage extends React.PureComponent {
-    static async getInitialProps({ query }) {
+    static async getInitialProps({ query, res }) {
         const postId = _.get(query, 'id');
+        const locals = _.get(res, 'locals');
 
-        return fetchPage(postId)
-            .then((page) => ({
-                page,
-                postId,
-                newPage: false
-            }))
-            .catch(() => ({
-                goToError: true
-            }));
+        return {
+            postId,
+            userId: locals.userId
+        };
     }
 
     constructor(props) {
         super(props);
 
-        if (_.isObject(_.get(props, 'page.data'))) {
-            this.state = {
-                modalOpen: false
-            };
-        } else {
-            this.state = {
-                error: {
-                    statusCode: 404,
-                    statusMessage: 'QR Page Not Found :('
-                },
-                modalOpen: false
-            };
-        }
+        this.state = {
+            modalOpen: false,
+            page: null
+        };
+    }
+
+    componentDidMount() {
+        const { postId } = this.props;
+
+        fetchPage(postId)
+            .then((page) => {
+                this.setState({
+                    page
+                });
+            })
+            .catch(() => {
+                this.setState({
+                    error: {
+                        statusCode: 404,
+                        statusMessage: 'QR Page Not Found :('
+                    }
+                });
+            });
     }
 
     toggleModal = () => {
@@ -90,8 +96,8 @@ class ViewPage extends React.PureComponent {
     };
 
     render() {
-        const { classes, page, postId, user } = this.props;
-        const { error, modalOpen } = this.state;
+        const { classes, postId, userId } = this.props;
+        const { error, modalOpen, page } = this.state;
 
         if (_.has(error, 'statusCode')) {
             return (
@@ -107,8 +113,8 @@ class ViewPage extends React.PureComponent {
         const isOwner =
             _.has(page, 'owner')
             && _.has(page, 'owner')
-            && _.has(user, 'uid')
-            && page.owner === user.uid;
+            && _.isString(userId)
+            && page.owner === userId;
 
         return (
             <Row className={classes.fullHeight}>
@@ -117,12 +123,12 @@ class ViewPage extends React.PureComponent {
                         <Col>
                             <Card>
                                 <CardHeader className={classes.header}>
-                                    {page.data.title}
+                                    {_.get(page, 'data.title')}
                                 </CardHeader>
-                                <LoadingCardBody isLoading={_.isNil(page) || _.isNil(user)}>
+                                <LoadingCardBody isLoading={_.isNil(page) || _.isNil(userId)}>
                                     {(_.has(page, 'data.caption') && page.data.caption.length > 0) && (
                                         <p>
-                                            {page.data.caption}
+                                            {_.get(page, 'data.caption')}
                                         </p>
                                     )}
                                     <ButtonGroup className={classes.buttonGroup}>
@@ -150,7 +156,7 @@ class ViewPage extends React.PureComponent {
                         <Col className={isMobile ? null : classes.fullHeight}>
                             <AddressListViewer
                                 className={classes.fullHeight}
-                                addresses={page.data.addresses}
+                                addresses={_.get(page, 'data.addresses', [])}
                             />
 
                             <AddressQRCode
@@ -171,8 +177,12 @@ class ViewPage extends React.PureComponent {
 
 ViewPage.propTypes = {
     classes: PropTypes.object.isRequired,
-    page: PropTypes.object.isRequired,
-    postId: PropTypes.string.isRequired
+    postId: PropTypes.string.isRequired,
+    userId: PropTypes.string
+};
+
+ViewPage.defaultProps = {
+    userId: null
 };
 
 export default withRouter(withStyles(styles)(ViewPage));

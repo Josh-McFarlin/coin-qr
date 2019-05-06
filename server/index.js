@@ -9,7 +9,7 @@ const cors = require('cors');
 const _ = require('lodash');
 
 const admin = require('./firebase');
-const routes = require('../frontend/utils/routes');
+const routes = require('../utils/routes');
 const urls = require('../utils/urls');
 
 
@@ -87,19 +87,21 @@ nextApp.prepare().then(() => {
             });
     });
 
-    server.use((req, res, cont) => {
-        res.locals.modified = 'yes';
+    server.use(async (req, res, cont) => {
+        res.locals.modified = false;
 
-        if (req.url === '/' || req.url.startsWith('/qr')) {
+        if (req.url === '/' || req.url.startsWith('/qr') || req.url.startsWith('/profile')) {
+            res.locals.modified = true;
+
             const sessionCookie = _.get(req, 'cookies.session');
 
             if (_.isString(sessionCookie) && !_.isEmpty(sessionCookie)) {
                 // Verify the session cookie. In this case an additional check is added to detect
                 // if the user's Firebase session was revoked, user deleted/disabled, etc.
-                admin.auth()
-                    .verifySessionCookie(sessionCookie, true /** checkRevoked */)
+                await admin.auth()
+                    .verifySessionCookie(sessionCookie, true)
                     .then((decodedClaims) => {
-                        res.locals.userId = decodedClaims.uid;
+                        res.locals.userId = decodedClaims.uid || decodedClaims.user_id;
                     });
             }
         }

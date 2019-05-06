@@ -16,15 +16,26 @@ const styles = () => ({
 });
 
 class RecentPage extends React.PureComponent {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            recentPages: []
+        };
+    }
+
     componentDidMount() {
-        this.setState({
-            pages: fetchRecent()
-        });
+        fetchRecent()
+            .then((recentPages) => {
+                this.setState({
+                    recentPages
+                });
+            });
     }
 
     render() {
         const { classes, router } = this.props;
-        const { pages } = this.state;
+        const { recentPages } = this.state;
 
         return (
             <Row>
@@ -47,7 +58,7 @@ class RecentPage extends React.PureComponent {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {pages.recentPages.map((page) => (
+                                        {recentPages.map((page) => (
                                             <tr
                                                 className={classes.row}
                                                 key={page.id}

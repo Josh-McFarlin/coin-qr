@@ -7,12 +7,20 @@ import {
     ModalFooter,
     ModalHeader
 } from 'shards-react';
+import withStyles from 'react-jss';
 
 
-const TermsModal = ({ isOpen, toggleModal }) => (
+const styles = () => ({
+    modalBody: {
+        maxHeight: '60vh',
+        overflow: 'auto'
+    }
+});
+
+const TermsModal = ({ classes, isOpen, toggleModal }) => (
     <Modal open={isOpen} size='lg' toggle={toggleModal}>
         <ModalHeader>Security and Terms of Use</ModalHeader>
-        <ModalBody>
+        <ModalBody className={classes.modalBody}>
             <h5>Security</h5>
             <ul>
                 <li>
@@ -79,8 +87,9 @@ const TermsModal = ({ isOpen, toggleModal }) => (
 );
 
 TermsModal.propTypes = {
+    classes: PropTypes.object.isRequired,
     isOpen: PropTypes.bool.isRequired,
     toggleModal: PropTypes.func.isRequired
 };
 
-export default TermsModal;
+export default withStyles(styles)(TermsModal);

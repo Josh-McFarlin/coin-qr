@@ -11,7 +11,6 @@ import {
     NavLink,
     Collapse
 } from 'shards-react';
-import Cookies from 'universal-cookie';
 import _ from 'lodash';
 
 import TermsModal from '../Terms/TermsModal';
@@ -28,10 +27,6 @@ const styles = () => ({
 class NavBar extends React.PureComponent {
     constructor(props) {
         super(props);
-
-        const cookies = new Cookies();
-
-        console.log('session', cookies.get('session'))
 
         this.state = {
             drawerOpen: false,

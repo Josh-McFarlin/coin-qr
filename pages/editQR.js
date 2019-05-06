@@ -43,60 +43,48 @@ class EditPage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
         const locals = _.get(res, 'locals');
 
-        console.log('locals2', locals);
+        const postId = _.get(query, 'id');
 
-        let postId = _.get(query, 'id');
-
-        if (_.isNil(postId)) {
-            const shortid = require('shortid');
-            const Hashids = require('hashids');
-
-            const hashKey = shortid.generate();
-            const hashids = new Hashids(hashKey, 5);
-
-            postId = hashids.encode(1);
-
-            return {
-                postId,
-                newPage: true
-            };
-        }
-
-        return fetchPage(postId)
-            .then((page) => ({
-                page,
-                postId,
-                newPage: false
-            }))
-            .catch(() => ({
-                goToError: {
-                    code: 404,
-                    message: 'QR Page Not Found'
-                }
-            }));
+        return {
+            postId,
+            newPage: _.isNil(postId) || _.isEmpty(postId),
+            userId: locals.userId
+        };
     }
 
     constructor(props) {
         super(props);
 
-        if (!props.newPage && _.isObject(_.get(props, 'page.data'))) {
-            if (!_.has(props, 'page.owner') || !_.has(props, 'user.uid') || props.page.owner !== props.user.uid) {
-                // props.router.push(urls.qr.view(props.postId));
-            }
+        this.state = {
+            page: null,
+            data: {
+                title: '',
+                caption: '',
+                addresses: []
+            },
+            showDelete: false
+        };
+    }
 
-            this.state = {
-                data: props.page.data,
-                showDelete: false
-            };
-        } else {
-            this.state = {
-                data: {
-                    title: '',
-                    caption: '',
-                    addresses: []
-                },
-                showDelete: false
-            };
+    componentDidMount() {
+        const { postId } = this.props;
+
+        if (_.isString(postId) && !_.isEmpty(postId)) {
+            fetchPage(postId)
+                .then((page) => {
+                    this.setState({
+                        page,
+                        data: page.data
+                    });
+                })
+                .catch(() => {
+                    this.setState({
+                        goToError: {
+                            code: 404,
+                            message: 'QR Page Not Found'
+                        }
+                    });
+                });
         }
     }
 
@@ -120,8 +108,8 @@ class EditPage extends React.PureComponent {
     };
 
     submitJson = () => {
-        const { dispatch, newPage, page, postId, router, user } = this.props;
-        const { data } = this.state;
+        const { postId, router, userId, newPage } = this.props;
+        const { page, data } = this.state;
 
         if (_.isNil(data.title) || data.title.length === 0) {
             this.setState({
@@ -145,13 +133,11 @@ class EditPage extends React.PureComponent {
                 }
             });
         } else if (newPage) {
-            const owner = _.get(user, 'uid');
-
-            dispatch(addPage(data, postId, owner)).then(() =>
-                router.push(urls.qr.view(postId)));
+            addPage(data, postId, userId)
+                .then(() => router.push(urls.qr.view(postId)));
         } else if (!_.isEqual(data, page.data)) {
-            dispatch(updatePage(data, postId)).then(() =>
-                router.push(urls.qr.view(postId)));
+            updatePage(data, postId)
+                .then(() => router.push(urls.qr.view(postId)));
         } else {
             router.push(urls.qr.view(postId));
         }
@@ -164,14 +150,15 @@ class EditPage extends React.PureComponent {
     };
 
     handleDelete = () => {
-        const { dispatch, postId, router } = this.props;
+        const { postId, router } = this.props;
 
-        dispatch(deletePage(postId)).then(() => router.push(urls.home()));
+        deletePage(postId)
+            .then(() => router.push(urls.home()));
     };
 
     render() {
-        const { classes, newPage, goToError } = this.props;
-        const { data, error, showDelete } = this.state;
+        const { classes, newPage } = this.props;
+        const { data, error, showDelete, goToError } = this.state;
 
         if (_.isObject(goToError)) {
             return (
@@ -202,7 +189,7 @@ class EditPage extends React.PureComponent {
                                                 invalid={_.get(error, 'type') === 'title' || data.title.length > 50}
                                             />
                                             <FormFeedback>
-                                            Please provide a title no longer than 50 characters in length.
+                                                Please provide a title no longer than 50 characters in length.
                                             </FormFeedback>
                                         </FormGroup>
                                         <FormGroup>
@@ -214,7 +201,7 @@ class EditPage extends React.PureComponent {
                                                 invalid={data.caption.length > 200}
                                             />
                                             <FormFeedback>
-                                            Please provide a title no longer than 200 characters in length.
+                                                Please provide a title no longer than 200 characters in length.
                                             </FormFeedback>
                                         </FormGroup>
                                     </Form>
@@ -249,13 +236,13 @@ class EditPage extends React.PureComponent {
                                             theme='danger'
                                             onClick={this.toggleDelete}
                                         >
-                                        Delete
+                                            Delete
                                         </Button>
                                         <Button
                                             theme='primary'
                                             onClick={this.submitJson}
                                         >
-                                        Save Page
+                                            Save Page
                                         </Button>
                                     </div>
                                 </CardFooter>
@@ -271,18 +258,14 @@ class EditPage extends React.PureComponent {
 EditPage.propTypes = {
     classes: PropTypes.object.isRequired,
     postId: PropTypes.string.isRequired,
-    newPage: PropTypes.bool.isRequired,
-    dispatch: PropTypes.func.isRequired,
-    page: PropTypes.object,
     router: PropTypes.object.isRequired,
-    goToError: PropTypes.object,
-    user: PropTypes.object
+    userId: PropTypes.string,
+    newPage: PropTypes.bool
 };
 
 EditPage.defaultProps = {
-    page: null,
-    goToError: null,
-    user: null
+    userId: null,
+    newPage: true
 };
 
 export default withRouter(withStyles(styles)(EditPage));
