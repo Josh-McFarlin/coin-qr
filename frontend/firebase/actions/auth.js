@@ -1,7 +1,8 @@
 import Cookies from 'universal-cookie';
-
-import firebase from './index';
 import Hashids from 'hashids';
+
+import firebase from '../index';
+import urls from '../../../utils/urls';
 
 
 const createProfile = (user) => {
@@ -49,6 +50,8 @@ export const registerNewUser = (email, password) =>
             const cookies = new Cookies();
             const csrfToken = cookies.get('csrfToken');
 
+            createProfile(user.user);
+
             user.user.getIdToken()
                 .then((idToken) =>
                     fetch('/sessionLogin', {
@@ -65,7 +68,7 @@ export const registerNewUser = (email, password) =>
                     }))
                 .then(() => firebase.auth().signOut())
                 .then(() => {
-                    window.location.assign('/');
+                    window.location.assign(urls.home());
                 });
         });
 
@@ -92,7 +95,7 @@ export const loginUser = (email, password) =>
                     }))
                 .then(() => firebase.auth().signOut())
                 .then(() => {
-                    window.location.assign('/');
+                    window.location.assign(urls.home());
                 });
         });
 

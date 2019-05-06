@@ -2,12 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
 import { Row, Col, Card, CardBody, CardHeader } from 'shards-react';
-import { connect } from 'react-redux';
 import moment from 'moment';
 import { withRouter } from 'next/router';
 
-import urls from '../src/utils/urls';
-import { fetchRecent, listenRecent } from '../src/redux/actions/pages';
+import urls from '../utils/urls';
+import { fetchRecent } from '../frontend/firebase/actions';
 
 
 const styles = () => ({
@@ -17,20 +16,15 @@ const styles = () => ({
 });
 
 class RecentPage extends React.PureComponent {
-    static async getInitialProps({ store }) {
-        await store.dispatch(fetchRecent());
-
-        return {};
-    }
-
     componentDidMount() {
-        const { dispatch } = this.props;
-
-        dispatch(listenRecent());
+        this.setState({
+            pages: fetchRecent()
+        });
     }
 
     render() {
-        const { classes, pages, router } = this.props;
+        const { classes, router } = this.props;
+        const { pages } = this.state;
 
         return (
             <Row>
@@ -80,19 +74,7 @@ class RecentPage extends React.PureComponent {
 
 RecentPage.propTypes = {
     classes: PropTypes.object.isRequired,
-    pages: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired
+    router: PropTypes.object.isRequired
 };
 
-const styledPage = withRouter(withStyles(styles)(RecentPage));
-
-export default connect(
-    (state) => {
-        const { pages } = state;
-
-        return {
-            pages
-        };
-    }
-)(styledPage);
+export default withRouter(withStyles(styles)(RecentPage));

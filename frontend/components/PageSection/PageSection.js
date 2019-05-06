@@ -8,7 +8,7 @@ import {
     Form, FormGroup, FormInput, FormTextarea, FormFeedback, ListGroup, ListGroupItem
 } from 'shards-react';
 
-import urls from '../../utils/urls';
+import urls from '../../../utils/urls';
 
 
 const styles = () => ({

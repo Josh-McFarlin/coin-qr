@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     home: () => '/',
     auth: () => '/login',
     recent: () => '/recent',
@@ -7,8 +7,11 @@ export default {
         view: (id) => `/qr/${id}`,
         edit: (id) => `/qr/${id}/edit`
     },
+    myProfile: {
+        view: () => '/myprofile',
+        edit: () => '/myprofile/edit'
+    },
     profile: {
-        view: (id) => `/profile${id ? `/${id}` : ''}`,
-        edit: () => '/profile/edit'
+        view: (id) => `/profile/${id}`
     }
 };

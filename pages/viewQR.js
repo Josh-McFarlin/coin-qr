@@ -6,16 +6,14 @@ import _ from 'lodash';
 import {
     Card, CardBody, CardHeader, Row, Col, Button, ButtonGroup
 } from 'shards-react';
-import { connect } from 'react-redux';
 import { isMobile } from 'react-device-detect';
 
-import AddressQRCode from '../src/components/AddressList/QRCode';
-import AddressListViewer from '../src/components/AddressList/AddressListViewer';
+import AddressQRCode from '../frontend/components/AddressList/QRCode';
+import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
 import Error from './_error';
-import urls from '../src/utils/urls';
-import { fetchPage } from '../src/redux/actions/pages';
-import { FETCH_PAGE_FAILURE } from '../src/redux/actions/pages/types';
-import LoadingCardBody from '../src/components/LoadingElements/LoadingCardBody';
+import urls from '../utils/urls';
+import { fetchPage } from '../frontend/firebase/actions';
+import LoadingCardBody from '../frontend/components/LoadingElements/LoadingCardBody';
 
 
 const styles = (theme) => ({
@@ -53,22 +51,18 @@ const styles = (theme) => ({
 });
 
 class ViewPage extends React.PureComponent {
-    static async getInitialProps({ query, store }) {
+    static async getInitialProps({ query }) {
         const postId = _.get(query, 'id');
 
-        return store.dispatch(fetchPage(postId)).then(({ type, payload }) => {
-            if (type === FETCH_PAGE_FAILURE) {
-                return {
-                    goToError: true
-                };
-            }
-
-            return {
-                page: payload.page,
+        return fetchPage(postId)
+            .then((page) => ({
+                page,
                 postId,
                 newPage: false
-            };
-        });
+            }))
+            .catch(() => ({
+                goToError: true
+            }));
     }
 
     constructor(props) {
@@ -181,12 +175,4 @@ ViewPage.propTypes = {
     postId: PropTypes.string.isRequired
 };
 
-const styledPage = withRouter(withStyles(styles)(ViewPage));
-
-export default connect((state) => {
-    const { auth } = state;
-
-    return {
-        user: _.get(auth, 'user')
-    };
-})(styledPage);
+export default withRouter(withStyles(styles)(ViewPage));

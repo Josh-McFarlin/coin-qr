@@ -7,15 +7,13 @@ import {
     Button, Card, CardBody, CardHeader, CardFooter, Row, Col,
     Form, FormGroup, FormInput, FormTextarea, FormFeedback
 } from 'shards-react';
-import { connect } from 'react-redux';
 
 import { isMobile } from 'react-device-detect';
 import Error from './_error';
-import AddressListEditor from '../src/components/AddressList/AddressListEditor';
-import DeleteDialog from '../src/components/AddressList/DeleteDialog';
-import { fetchPage, addPage, updatePage, deletePage } from '../src/redux/actions/pages';
-import urls from '../src/utils/urls';
-import { FETCH_PAGE_FAILURE } from '../src/redux/actions/pages/types';
+import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
+import DeleteDialog from '../frontend/components/AddressList/DeleteDialog';
+import { fetchPage, addPage, updatePage, deletePage } from '../frontend/firebase/actions';
+import urls from '../utils/urls';
 
 
 const styles = () => ({
@@ -42,7 +40,11 @@ const styles = () => ({
 });
 
 class EditPage extends React.PureComponent {
-    static async getInitialProps({ locals, query, store }) {
+    static async getInitialProps({ query, res }) {
+        const locals = _.get(res, 'locals');
+
+        console.log('locals2', locals);
+
         let postId = _.get(query, 'id');
 
         if (_.isNil(postId)) {
@@ -60,22 +62,18 @@ class EditPage extends React.PureComponent {
             };
         }
 
-        return store.dispatch(fetchPage(postId)).then(({ type, payload }) => {
-            if (type === FETCH_PAGE_FAILURE) {
-                return {
-                    goToError: {
-                        code: 404,
-                        message: 'QR Page Not Found'
-                    }
-                };
-            }
-
-            return {
-                page: payload.page,
+        return fetchPage(postId)
+            .then((page) => ({
+                page,
                 postId,
                 newPage: false
-            };
-        });
+            }))
+            .catch(() => ({
+                goToError: {
+                    code: 404,
+                    message: 'QR Page Not Found'
+                }
+            }));
     }
 
     constructor(props) {
@@ -287,12 +285,4 @@ EditPage.defaultProps = {
     user: null
 };
 
-const styledPage = withRouter(withStyles(styles)(EditPage));
-
-export default connect((state) => {
-    const { auth } = state;
-
-    return {
-        user: _.get(auth, 'user')
-    };
-})(styledPage);
+export default withRouter(withStyles(styles)(EditPage));

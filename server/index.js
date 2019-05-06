@@ -9,7 +9,8 @@ const cors = require('cors');
 const _ = require('lodash');
 
 const admin = require('./firebase');
-const routes = require('../src/utils/routes');
+const routes = require('../frontend/utils/routes');
+const urls = require('../utils/urls');
 
 
 const nextApp = next({
@@ -21,7 +22,7 @@ const handler = routes.getRequestHandler(nextApp);
 const csrfProtection = csurf({
     cookie: {
         key: '_csrf',
-        path: '/login',
+        path: urls.auth(),
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 3600 // 1-hour
@@ -40,8 +41,6 @@ nextApp.prepare().then(() => {
         server.use(compression());
     }
 
-
-
     server.get('/login', csrfProtection, (req, res, cont) => {
         if (_.has(req, 'cookies.session')) {
             res.redirect('back');
@@ -52,7 +51,6 @@ nextApp.prepare().then(() => {
 
         cont();
     });
-
 
     server.post('/sessionLogin', (req, res) => {
         // Get the ID token passed and the CSRF token.
@@ -90,13 +88,20 @@ nextApp.prepare().then(() => {
     });
 
     server.use((req, res, cont) => {
-        if (req.url.match(/\/edit\/?$/g)) {
-            console.log(req.url)
-            console.log('ends with edit!')
-            console.log('~~~~')
+        res.locals.modified = 'yes';
 
-            res.locals.otherData = 'IT WORKS!'
-            res.otherData = 'IT WORKS!'
+        if (req.url === '/' || req.url.startsWith('/qr')) {
+            const sessionCookie = _.get(req, 'cookies.session');
+
+            if (_.isString(sessionCookie) && !_.isEmpty(sessionCookie)) {
+                // Verify the session cookie. In this case an additional check is added to detect
+                // if the user's Firebase session was revoked, user deleted/disabled, etc.
+                admin.auth()
+                    .verifySessionCookie(sessionCookie, true /** checkRevoked */)
+                    .then((decodedClaims) => {
+                        res.locals.userId = decodedClaims.uid;
+                    });
+            }
         }
 
         cont();
@@ -104,27 +109,29 @@ nextApp.prepare().then(() => {
 
     server.post('/sessionLogout', (req, res) => {
         res.clearCookie('session');
-        res.redirect('/');
+        res.redirect(urls.home());
     });
 
-    server.get('/test', (req, res) => {
+    server.get('/myprofile', (req, res, cont) => {
         const sessionCookie = _.get(req, 'cookies.session', '');
 
-        // Verify the session cookie. In this case an additional check is added to detect
-        // if the user's Firebase session was revoked, user deleted/disabled, etc.
-        admin.auth()
-            .verifySessionCookie(sessionCookie, true /** checkRevoked */)
-            .then((decodedClaims) => {
-                console.log('decodedClaims', decodedClaims);
+        if (_.isString(sessionCookie) && !_.isEmpty(sessionCookie)) {
+            // Verify the session cookie. In this case an additional check is added to detect
+            // if the user's Firebase session was revoked, user deleted/disabled, etc.
+            admin.auth()
+                .verifySessionCookie(sessionCookie, true /** checkRevoked */)
+                .then((decodedClaims) => {
+                    res.redirect(urls.profile.view(decodedClaims.uid));
+                })
+                .catch(() => {
+                    res.redirect(urls.auth());
+                });
+        } else {
+            res.redirect(urls.auth());
+        }
 
-                res.send('Hello World!');
-            })
-            .catch(() => {
-                res.redirect('/login');
-            });
+        cont();
     });
-
-
 
     server.use(handler).listen(3000);
 });

@@ -7,8 +7,8 @@ import {
     InputGroupText, FormInput, Card, CardHeader, CardBody, CardFooter
 } from 'shards-react';
 
-import { loginUser, registerNewUser, resetPassword } from '../src/firebase/actions';
-import TermsModal from '../src/components/Terms/TermsModal';
+import { loginUser, registerNewUser, resetPassword } from '../frontend/firebase/actions';
+import TermsModal from '../frontend/components/Terms/TermsModal';
 
 
 const styles = () => ({

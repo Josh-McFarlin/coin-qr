@@ -4,17 +4,15 @@ import withStyles from 'react-jss';
 import { withRouter } from 'next/router';
 import _ from 'lodash';
 import { Card, CardHeader, Row, Col, ListGroup } from 'shards-react';
-import { connect } from 'react-redux';
 import { isMobile } from 'react-device-detect';
 import shortHash from 'short-hash';
 
 import Error from './_error';
-import firebase from '../src/firebase';
-import { fetchProfile, fetchRecent, fetchPage } from '../src/redux/actions';
-import { FETCH_PROFILE_FAILURE } from '../src/redux/actions/profiles/types';
-import AddressListEditor from '../src/components/AddressList/AddressListEditor';
-import PageSection from '../src/components/PageSection/PageSection';
-import LoadingCardBody from '../src/components/LoadingElements/LoadingCardBody';
+import firebase from '../frontend/firebase';
+import { fetchProfile, fetchRecent, fetchPage } from '../frontend/firebase/actions';
+import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
+import PageSection from '../frontend/components/PageSection/PageSection';
+import LoadingCardBody from '../frontend/components/LoadingElements/LoadingCardBody';
 import noProfilePic from '../static/images/noProfilePic.png';
 
 
@@ -312,14 +310,4 @@ EditProfilePage.defaultProps = {
     recentPages: null
 };
 
-const styledPage = withRouter(withStyles(styles)(EditProfilePage));
-
-export default connect((state) => {
-    const { profiles, pages } = state;
-
-    return {
-        profile: _.get(profiles, 'profile'),
-        featuredPage: _.get(pages, 'page'),
-        recentPages: _.get(pages, 'recentPages')
-    };
-})(styledPage);
+export default withRouter(withStyles(styles)(EditProfilePage));

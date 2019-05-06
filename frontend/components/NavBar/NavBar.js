@@ -11,12 +11,12 @@ import {
     NavLink,
     Collapse
 } from 'shards-react';
-import { connect } from 'react-redux';
+import Cookies from 'universal-cookie';
 import _ from 'lodash';
 
 import TermsModal from '../Terms/TermsModal';
-import urls from '../../utils/urls';
-import { signOut } from '../../redux/actions/auth';
+import urls from '../../../utils/urls';
+import { signOut } from '../../firebase/actions';
 
 
 const styles = () => ({
@@ -28,6 +28,10 @@ const styles = () => ({
 class NavBar extends React.PureComponent {
     constructor(props) {
         super(props);
+
+        const cookies = new Cookies();
+
+        console.log('session', cookies.get('session'))
 
         this.state = {
             drawerOpen: false,
@@ -48,11 +52,12 @@ class NavBar extends React.PureComponent {
     };
 
     handleSignout = () => {
-        const { dispatch, router } = this.props;
+        const { router } = this.props;
 
-        dispatch(signOut()).then(() => {
-            router.push(urls.home());
-        });
+        signOut()
+            .then(() => {
+                router.push(urls.home());
+            });
     };
 
     render() {
@@ -90,8 +95,8 @@ class NavBar extends React.PureComponent {
                             {_.isObject(user) && (
                                 <NavItem className={classes.navItem}>
                                     <NavLink
-                                        active={router.asPath === urls.profile.view()}
-                                        href={urls.profile.view()}
+                                        active={router.asPath === urls.myProfile.view()}
+                                        href={urls.myProfile.view()}
                                     >
                                         Profile
                                     </NavLink>
@@ -141,22 +146,11 @@ class NavBar extends React.PureComponent {
 NavBar.propTypes = {
     classes: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
-    user: PropTypes.object,
-    dispatch: PropTypes.func.isRequired
+    user: PropTypes.object
 };
 
 NavBar.defaultProps = {
     user: null
 };
 
-const styledComponent = withRouter(withStyles(styles)(NavBar));
-
-export default connect(
-    (state) => {
-        const { auth } = state;
-
-        return {
-            user: _.get(auth, 'user')
-        };
-    }
-)(withRouter(styledComponent));
+export default withRouter(withStyles(styles)(NavBar));

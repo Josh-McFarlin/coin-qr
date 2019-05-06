@@ -4,17 +4,15 @@ import withStyles from 'react-jss';
 import { withRouter } from 'next/router';
 import _ from 'lodash';
 import { Card, CardHeader, Row, Col, ListGroup } from 'shards-react';
-import { connect } from 'react-redux';
 import { isMobile } from 'react-device-detect';
 import shortHash from 'short-hash';
 
 import Error from './_error';
-import firebase from '../src/firebase';
-import { fetchProfile, fetchRecent, fetchPage } from '../src/redux/actions';
-import { FETCH_PROFILE_FAILURE } from '../src/redux/actions/profiles/types';
-import AddressListViewer from '../src/components/AddressList/AddressListViewer';
-import PageSection from '../src/components/PageSection/PageSection';
-import LoadingCardBody from '../src/components/LoadingElements/LoadingCardBody';
+import firebase from '../frontend/firebase';
+import { fetchProfile, fetchRecent, fetchPage } from '../frontend/firebase/actions';
+import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
+import PageSection from '../frontend/components/PageSection/PageSection';
+import LoadingCardBody from '../frontend/components/LoadingElements/LoadingCardBody';
 import noProfilePic from '../static/images/noProfilePic.png';
 
 
@@ -300,7 +298,6 @@ class ViewProfilePage extends React.PureComponent {
 ViewProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired,
     profile: PropTypes.object,
     featuredPage: PropTypes.object,
     recentPages: PropTypes.array
@@ -312,14 +309,4 @@ ViewProfilePage.defaultProps = {
     recentPages: null
 };
 
-const styledPage = withRouter(withStyles(styles)(ViewProfilePage));
-
-export default connect((state) => {
-    const { profiles, pages } = state;
-
-    return {
-        profile: _.get(profiles, 'profile'),
-        featuredPage: _.get(pages, 'page'),
-        recentPages: _.get(pages, 'recentPages')
-    };
-})(styledPage);
+export default withRouter(withStyles(styles)(ViewProfilePage));

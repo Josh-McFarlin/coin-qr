@@ -8,6 +8,5 @@ module.exports = routes()
     .add('create', '/qr', 'edit')
     .add('viewQR', '/qr/:id')
     .add('editQR', '/qr/:id/edit')
-    .add('myProfile', '/myprofile', 'viewProfile')
-    .add('editProfile', '/myprofile/edit')
-    .add('viewProfile', '/profile/:id?');
+    .add('viewProfile', '/profile/:id?')
+    .add('editProfile', '/profile/:id/edit');

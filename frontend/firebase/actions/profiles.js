@@ -1,18 +1,10 @@
 import Hashids from 'hashids';
 import _ from 'lodash';
 
-import firebase from '../../../firebase/index';
-import {
-    FETCH_PROFILE_SUCCESSFUL,
-    FETCH_PROFILE_FAILURE,
-    UPDATE_PROFILE_SUCCESSFUL,
-    UPDATE_PROFILE_FAILURE,
-    CREATE_PROFILE_SUCCESSFUL,
-    CREATE_PROFILE_FAILURE
-} from './types';
+import firebase from '../index';
 
 
-export const fetchProfile = (id) => (dispatch) =>
+export const fetchProfile = (id) =>
     firebase.firestore()
         .collection('profiles')
         .doc(id)
@@ -31,25 +23,13 @@ export const fetchProfile = (id) => (dispatch) =>
 
                 data.id = profile.id;
 
-                const payload = {
-                    profile: data
-                };
-
-                return dispatch({
-                    type: FETCH_PROFILE_SUCCESSFUL,
-                    payload
-                });
+                return data;
             }
 
-            return dispatch({
-                type: FETCH_PROFILE_FAILURE
-            });
-        })
-        .catch(() => dispatch({
-            type: FETCH_PROFILE_FAILURE
-        }));
+            throw Error('Profile not found');
+        });
 
-export const createProfile = (user) => (dispatch) => {
+export const createProfile = (user) => {
     const date = new Date();
 
     const hashids = new Hashids(user.uid, 5);
@@ -85,16 +65,10 @@ export const createProfile = (user) => (dispatch) => {
         .collection('profiles')
         .doc(profileId)
         .set(profile)
-        .then(() => dispatch({
-            type: CREATE_PROFILE_SUCCESSFUL,
-            payload: { profile }
-        }))
-        .catch(() => dispatch({
-            type: CREATE_PROFILE_FAILURE
-        }));
+        .then(() => profile);
 };
 
-export const updateProfile = (data, id) => (dispatch) => {
+export const updateProfile = (data, id) => {
     const date = new Date();
 
     const profile = {
@@ -106,11 +80,5 @@ export const updateProfile = (data, id) => (dispatch) => {
         .collection('profiles')
         .doc(id)
         .update(profile)
-        .then(() => dispatch({
-            type: UPDATE_PROFILE_SUCCESSFUL,
-            payload: profile
-        }))
-        .catch(() => dispatch({
-            type: UPDATE_PROFILE_FAILURE
-        }));
+        .then(() => profile);
 };
