@@ -3,7 +3,7 @@ module.exports = {
     auth: () => '/login',
     recent: () => '/recent',
     qr: {
-        create: () => '/qr',
+        create: () => '/create',
         view: (id) => `/qr/${id}`,
         edit: (id) => `/qr/${id}/edit`
     },

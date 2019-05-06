@@ -37,11 +37,6 @@ const TermsModal = ({ classes, isOpen, toggleModal }) => (
                         This tool is completely open-source, and can be viewed on GitHub!
                     </a>
                 </li>
-                <li>
-                    The Terms of Use below sound scary, but that is only make sure you know that the owner
-                    of this tool is not responsible for any issues with the tool or incorrectly sent funds.
-                    I highly encourage you to review the GitHub repository to address any concerns.
-                </li>
             </ul>
             <h5>Terms of Use</h5>
             <ul>

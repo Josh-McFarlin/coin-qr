@@ -41,11 +41,14 @@ const styles = () => ({
     profileName: {
         textAlign: 'center'
     },
+    profileCol: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     profilePicture: {
         width: '100%',
         maxWidth: 150,
-        marginLeft: 'auto',
-        marginRight: 'auto',
         borderRadius: '50%'
     },
     scrollBody: {
@@ -60,8 +63,6 @@ const styles = () => ({
 class ViewProfilePage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
         const locals = _.get(res, 'locals', {});
-
-        console.log('locals2', locals);
 
         return {
             myUserId: locals.userId
@@ -89,9 +90,9 @@ class ViewProfilePage extends React.PureComponent {
                     profile
                 });
 
-                const featured = _.get(profile, 'data.featuredPage.featuredPage');
+                const featured = _.get(profile, 'data.featuredPage');
 
-                if (_.isString(featured) && _.get(profile, 'data.featuredPage.public', false)) {
+                if (_.isString(featured) && !_.isEmpty(featured)) {
                     fetchPage(featured)
                         .then((featuredPage) => {
                             this.setState({
@@ -139,32 +140,26 @@ class ViewProfilePage extends React.PureComponent {
                 <LoadingCardBody isLoading={_.isNil(profile)}>
                     <Row className={classes.rowNoPadding}>
                         <Col sm={2}>
-                            {_.get(profile, 'data.name.public', false) && (
-                                <Row>
-                                    <Col className={classes.profileName}>
-                                        <b>
-                                            {_.get(profile, 'data.name.name')}
-                                        </b>
-                                    </Col>
-                                </Row>
-                            )}
-                            {_.get(profile, 'data.picture.public', false) && (
-                                <Row className={classes.rowNoPadding}>
-                                    <Col>
-                                        <img
-                                            className={classes.profilePicture}
-                                            src={_.get(profile, 'data.picture.picture', noProfilePic)}
-                                            alt='Profile'
-                                        />
-                                    </Col>
-                                </Row>
-                            )}
+                            <Row>
+                                <Col className={classes.profileName}>
+                                    <b>
+                                        {_.get(profile, 'data.name')}
+                                    </b>
+                                </Col>
+                            </Row>
+                            <Row className={classes.rowNoPadding}>
+                                <Col className={classes.profileCol}>
+                                    <img
+                                        className={classes.profilePicture}
+                                        src={_.get(profile, 'data.picture', noProfilePic)}
+                                        alt='Profile'
+                                    />
+                                </Col>
+                            </Row>
                         </Col>
-                        {_.get(profile, 'data.bio.public', false) && (
-                            <Col sm={10}>
-                                {_.get(profile, 'data.bio.bio')}
-                            </Col>
-                        )}
+                        <Col sm={10}>
+                            {_.get(profile, 'data.bio')}
+                        </Col>
                     </Row>
                 </LoadingCardBody>
             </Card>
@@ -173,7 +168,7 @@ class ViewProfilePage extends React.PureComponent {
         const addressSection = (
             <AddressListViewer
                 className={classes.fullHeight}
-                addresses={_.get(profile, 'data.addresses.addresses')}
+                addresses={_.get(profile, 'data.addresses', [])}
             />
         );
 
@@ -220,20 +215,16 @@ class ViewProfilePage extends React.PureComponent {
                                 {profileSection}
                             </Col>
                         </Row>
-                        {_.get(profile, 'data.featuredPage.public', false) && (
-                            <Row>
-                                <Col>
-                                    {featuredSection}
-                                </Col>
-                            </Row>
-                        )}
-                        {_.get(profile, 'data.addresses.public', false) && (
-                            <Row>
-                                <Col>
-                                    {addressSection}
-                                </Col>
-                            </Row>
-                        )}
+                        <Row>
+                            <Col>
+                                {featuredSection}
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                {addressSection}
+                            </Col>
+                        </Row>
                         <Row>
                             <Col>
                                 {otherSection}
@@ -253,22 +244,18 @@ class ViewProfilePage extends React.PureComponent {
                                 {profileSection}
                             </Col>
                         </Row>
-                        {_.get(profile, 'data.addresses.public', false) && (
-                            <Row className={classes.flexFill}>
-                                <Col>
-                                    {addressSection}
-                                </Col>
-                            </Row>
-                        )}
+                        <Row className={classes.flexFill}>
+                            <Col>
+                                {addressSection}
+                            </Col>
+                        </Row>
                     </Col>
                     <Col sm={4} className={`${classes.fullHeight} ${classes.flexColumn}`}>
-                        {_.get(profile, 'data.featuredPage.public', false) && (
-                            <Row>
-                                <Col>
-                                    {featuredSection}
-                                </Col>
-                            </Row>
-                        )}
+                        <Row>
+                            <Col>
+                                {featuredSection}
+                            </Col>
+                        </Row>
                         <Row className={classes.flexFill}>
                             <Col className={classes.fullHeight}>
                                 {otherSection}

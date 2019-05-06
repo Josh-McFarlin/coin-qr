@@ -11,6 +11,7 @@ const _ = require('lodash');
 const admin = require('./firebase');
 const routes = require('../utils/routes');
 const urls = require('../utils/urls');
+const hashUtil = require('../utils/hash');
 
 
 const nextApp = next({
@@ -52,7 +53,7 @@ nextApp.prepare().then(() => {
         cont();
     });
 
-    server.post('/sessionLogin', (req, res) => {
+    server.post('/sessionLogin', async (req, res) => {
         // Get the ID token passed and the CSRF token.
         const idToken = req.body.idToken.toString();
         const csrfToken = req.body.csrfToken.toString();
@@ -70,7 +71,7 @@ nextApp.prepare().then(() => {
         // The session cookie will have the same claims as the ID token.
         // To only allow session cookie setting on recent sign-in, auth_time in ID token
         // can be checked to ensure user was recently signed in before creating a session cookie.
-        admin.auth()
+        await admin.auth()
             .createSessionCookie(idToken, { expiresIn })
             .then((sessionCookie) => {
                 res.cookie('session', sessionCookie, {
@@ -90,20 +91,17 @@ nextApp.prepare().then(() => {
     server.use(async (req, res, cont) => {
         res.locals.modified = false;
 
-        if (req.url === '/' || req.url.startsWith('/qr') || req.url.startsWith('/profile')) {
+        const sessionCookie = _.get(req, 'cookies.session');
+
+        if (_.isString(sessionCookie) && !_.isEmpty(sessionCookie)) {
             res.locals.modified = true;
-
-            const sessionCookie = _.get(req, 'cookies.session');
-
-            if (_.isString(sessionCookie) && !_.isEmpty(sessionCookie)) {
-                // Verify the session cookie. In this case an additional check is added to detect
-                // if the user's Firebase session was revoked, user deleted/disabled, etc.
-                await admin.auth()
-                    .verifySessionCookie(sessionCookie, true)
-                    .then((decodedClaims) => {
-                        res.locals.userId = decodedClaims.uid || decodedClaims.user_id;
-                    });
-            }
+            // Verify the session cookie. In this case an additional check is added to detect
+            // if the user's Firebase session was revoked, user deleted/disabled, etc.
+            await admin.auth()
+                .verifySessionCookie(sessionCookie, false)
+                .then((decodedClaims) => {
+                    res.locals.userId = decodedClaims.uid || decodedClaims.user_id;
+                });
         }
 
         cont();
@@ -114,16 +112,20 @@ nextApp.prepare().then(() => {
         res.redirect(urls.home());
     });
 
-    server.get('/myprofile', (req, res, cont) => {
+    server.get('/myprofile', async (req, res, cont) => {
         const sessionCookie = _.get(req, 'cookies.session', '');
 
         if (_.isString(sessionCookie) && !_.isEmpty(sessionCookie)) {
             // Verify the session cookie. In this case an additional check is added to detect
             // if the user's Firebase session was revoked, user deleted/disabled, etc.
-            admin.auth()
+            await admin.auth()
                 .verifySessionCookie(sessionCookie, true /** checkRevoked */)
                 .then((decodedClaims) => {
-                    res.redirect(urls.profile.view(decodedClaims.uid));
+                    res.redirect(
+                        urls.profile.view(
+                            hashUtil.hashUID(decodedClaims.uid)
+                        )
+                    );
                 })
                 .catch(() => {
                     res.redirect(urls.auth());

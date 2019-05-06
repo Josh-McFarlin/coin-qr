@@ -4,7 +4,7 @@ import withStyles from 'react-jss';
 import { withRouter } from 'next/router';
 import _ from 'lodash';
 import {
-    Card, CardBody, CardHeader, Row, Col, Button, ButtonGroup
+    Card, CardHeader, Row, Col, Button, ButtonGroup
 } from 'shards-react';
 import { isMobile } from 'react-device-detect';
 
@@ -53,7 +53,7 @@ const styles = (theme) => ({
 class ViewPage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
         const postId = _.get(query, 'id');
-        const locals = _.get(res, 'locals');
+        const locals = _.get(res, 'locals', {});
 
         return {
             postId,

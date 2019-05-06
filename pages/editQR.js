@@ -30,6 +30,9 @@ const styles = () => ({
     fullHeight: {
         height: '100%'
     },
+    fullDesktopHeight: {
+        height: isMobile ? 'unset' : '100%'
+    },
     flexColumn: {
         display: 'flex',
         flexDirection: 'column'
@@ -41,8 +44,7 @@ const styles = () => ({
 
 class EditPage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
-        const locals = _.get(res, 'locals');
-
+        const locals = _.get(res, 'locals', {});
         const postId = _.get(query, 'id');
 
         return {
@@ -133,8 +135,10 @@ class EditPage extends React.PureComponent {
                 }
             });
         } else if (newPage) {
-            addPage(data, postId, userId)
-                .then(() => router.push(urls.qr.view(postId)));
+            console.log('userId', userId)
+
+            addPage(data, userId)
+                .then((created) => router.push(urls.qr.view(created.postId)));
         } else if (!_.isEqual(data, page.data)) {
             updatePage(data, postId)
                 .then(() => router.push(urls.qr.view(postId)));
@@ -171,7 +175,7 @@ class EditPage extends React.PureComponent {
 
         return (
             <Row className={classes.fullHeight}>
-                <Col className={`${classes.fullHeight} ${classes.flexColumn}`}>
+                <Col className={`${classes.fullDesktopHeight} ${classes.flexColumn}`}>
                     <Row>
                         <Col>
                             <Card>
@@ -211,7 +215,7 @@ class EditPage extends React.PureComponent {
                     </Row>
 
                     <Row className={classes.flexFill}>
-                        <Col className={isMobile ? null : classes.fullHeight}>
+                        <Col className={classes.fullDesktopHeight}>
                             <AddressListEditor
                                 className={classes.fullHeight}
                                 addresses={data.addresses}
