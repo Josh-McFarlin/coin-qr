@@ -4,9 +4,9 @@ import withStyles from 'react-jss';
 import { Row, Col, Card, CardBody, CardHeader } from 'shards-react';
 import moment from 'moment';
 import { withRouter } from 'next/router';
+import _ from 'lodash';
 
 import urls from '../utils/urls';
-import { fetchRecent } from '../frontend/firebase/actions';
 
 
 const styles = () => ({
@@ -16,26 +16,16 @@ const styles = () => ({
 });
 
 class RecentPage extends React.PureComponent {
-    constructor(props) {
-        super(props);
+    static async getInitialProps({ query, res }) {
+        const locals = _.get(res, 'locals', {});
 
-        this.state = {
-            recentPages: []
+        return {
+            recentPages: locals.recentPages
         };
     }
 
-    componentDidMount() {
-        fetchRecent()
-            .then((recentPages) => {
-                this.setState({
-                    recentPages
-                });
-            });
-    }
-
     render() {
-        const { classes, router } = this.props;
-        const { recentPages } = this.state;
+        const { classes, router, recentPages } = this.props;
 
         return (
             <Row>

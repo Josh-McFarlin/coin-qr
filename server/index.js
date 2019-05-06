@@ -12,6 +12,7 @@ const admin = require('./firebase');
 const routes = require('../utils/routes');
 const urls = require('../utils/urls');
 const hashUtil = require('../utils/hash');
+const firebaseActions = require('./firebase/actions');
 
 
 const nextApp = next({
@@ -110,6 +111,15 @@ nextApp.prepare().then(() => {
     server.post('/sessionLogout', (req, res) => {
         res.clearCookie('session');
         res.redirect(urls.home());
+    });
+
+    server.get(urls.recent(), async (req, res, cont) => {
+        await firebaseActions.pages.fetchRecent()
+            .then((pages) => {
+                res.locals.recentPages = pages;
+            });
+
+        cont();
     });
 
     server.get('/myprofile', async (req, res, cont) => {

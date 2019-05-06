@@ -1,3 +1,2 @@
-export * from './auth';
-export * from './pages';
-export * from './profiles';
+exports.pages = require('./pages');
+exports.profiles = require('./profiles');

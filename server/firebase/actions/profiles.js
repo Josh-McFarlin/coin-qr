@@ -1,10 +1,10 @@
-import Hashids from 'hashids';
-import _ from 'lodash';
+const Hashids = require('hashids');
+const _ = require('lodash');
 
-import firebase from '../index';
+const firebase = require('../index');
 
 
-export const fetchProfile = (id) =>
+module.exports.fetchProfile = (id) =>
     firebase.firestore()
         .collection('profiles')
         .doc(id)
@@ -29,7 +29,7 @@ export const fetchProfile = (id) =>
             throw Error('Profile not found');
         });
 
-export const createProfile = (user) => {
+module.exports.createProfile = (user) => {
     const date = new Date();
 
     const hashids = new Hashids(user.uid, 5);
@@ -68,7 +68,7 @@ export const createProfile = (user) => {
         .then(() => profile);
 };
 
-export const updateProfile = (data, id) => {
+module.exports.updateProfile = (data, id) => {
     const date = new Date();
 
     const profile = {

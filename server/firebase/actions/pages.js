@@ -1,10 +1,10 @@
-import _ from 'lodash';
+const _ = require('lodash');
 
-import firebase from '../index';
-import hashUtils from '../../../utils/hash';
+const firebase = require('../index');
+const hashUtils = require('../../../utils/hash');
 
 
-export const fetchPage = (id) =>
+module.exports.fetchPage = (id) =>
     firebase.firestore()
         .collection('pages')
         .doc(id)
@@ -20,7 +20,7 @@ export const fetchPage = (id) =>
             throw Error('Page does not exist!');
         });
 
-export const addPage = (data, owner) => {
+module.exports.addPage = (data, owner) => {
     const date = new Date();
 
     const page = {
@@ -41,14 +41,14 @@ export const addPage = (data, owner) => {
 
     page.postId = hashUtils.hashUID(docRef.id);
 
-    console.log('page', page)
+    console.log('page', page);
 
     return docRef
         .set(page)
         .then(() => page);
 };
 
-export const updatePage = (data, id) => {
+module.exports.updatePage = (data, id) => {
     const date = new Date();
 
     const page = {
@@ -63,13 +63,13 @@ export const updatePage = (data, id) => {
         .then(() => page);
 };
 
-export const deletePage = (id) =>
+module.exports.deletePage = (id) =>
     firebase.firestore()
         .collection('pages')
         .doc(id)
         .delete();
 
-export const fetchRecent = (userId) => {
+module.exports.fetchRecent = (userId) => {
     let pages = firebase.firestore().collection('pages');
 
     if (_.isString(userId)) {
