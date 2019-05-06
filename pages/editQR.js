@@ -42,7 +42,7 @@ const styles = () => ({
 });
 
 class EditPage extends React.PureComponent {
-    static async getInitialProps({ ctx, Component, query, store }) {
+    static async getInitialProps({ locals, query, store }) {
         let postId = _.get(query, 'id');
 
         if (_.isNil(postId)) {
@@ -83,7 +83,7 @@ class EditPage extends React.PureComponent {
 
         if (!props.newPage && _.isObject(_.get(props, 'page.data'))) {
             if (!_.has(props, 'page.owner') || !_.has(props, 'user.uid') || props.page.owner !== props.user.uid) {
-                props.router.push(urls.qr.view(props.postId));
+                // props.router.push(urls.qr.view(props.postId));
             }
 
             this.state = {

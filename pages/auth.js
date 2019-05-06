@@ -1,4 +1,3 @@
-/* eslint-disable import/no-dynamic-require */
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
@@ -7,18 +6,8 @@ import {
     Collapse, Alert, Button, Form, FormGroup, InputGroup, InputGroupAddon,
     InputGroupText, FormInput, Card, CardHeader, CardBody, CardFooter
 } from 'shards-react';
-import { connect } from 'react-redux';
-import { withRouter } from 'next/router';
 
-import { loginUser, registerNewUser, resetPassword } from '../src/redux/actions/auth';
-import { createProfile } from '../src/redux/actions/profiles';
-import {
-    AUTH_SUCCESSFUL,
-    AUTH_FAILURE,
-    RESET_PASSWORD_SUCCESSFUL,
-    RESET_PASSWORD_FAILURE
-} from '../src/redux/actions/auth/types';
-import urls from '../src/utils/urls';
+import { loginUser, registerNewUser, resetPassword } from '../src/firebase/actions';
 import TermsModal from '../src/components/Terms/TermsModal';
 
 
@@ -65,50 +54,81 @@ class AuthPage extends React.PureComponent {
     };
 
     handlePasswordReset = () => {
-        const { dispatch } = this.props;
         const { email } = this.state;
 
-        dispatch(resetPassword(email)).then(({ type }) => {
-            if (type === RESET_PASSWORD_SUCCESSFUL) {
+        resetPassword(email)
+            .then(() => {
                 this.setState({
                     success: 'Successfully reset password. Please check your email.'
                 });
-            } else if (type === RESET_PASSWORD_FAILURE) {
+            })
+            .catch(() => {
                 this.setState({
                     error: 'Failed to reset password. Is the email correct?'
                 });
-            }
-        });
+            });
     };
 
     handleAuth = () => {
-        const { dispatch, router } = this.props;
         const { email, password, isRegistering } = this.state;
 
         if (isRegistering) {
-            dispatch(registerNewUser(email, password))
-                .then(({ type, payload }) => {
-                    if (type === AUTH_FAILURE) {
-                        this.setState({
-                            error: payload.authFailure
-                        });
-                    } else if (type === AUTH_SUCCESSFUL) {
-                        router.push(urls.home());
+            registerNewUser(email, password)
+                .catch((error) => {
+                    const errorCode = error.code;
+
+                    let errorTarget;
+                    let errorMessage;
+
+                    if (errorCode === 'auth/invalid-email') {
+                        errorTarget = 'email';
+                        errorMessage = 'The entered email is invalid!';
+                    } else if (errorCode === 'auth/email-already-in-use') {
+                        errorTarget = 'email';
+                        errorMessage = 'An account already exists with the provided email address!';
+                    } else if (errorCode === 'auth/weak-password') {
+                        errorTarget = 'password';
+                        errorMessage = 'The provided password is too weak!';
+                    } else {
+                        errorTarget = 'email';
+                        errorMessage = 'Could not register at this time. Please try again later!';
                     }
 
-                    return payload;
-                })
-                .then(({ user }) => dispatch(createProfile(user)));
+                    this.setState({
+                        error: {
+                            target: errorTarget,
+                            message: errorMessage
+                        }
+                    });
+                });
         } else {
-            dispatch(loginUser(email, password))
-                .then(({ type, payload }) => {
-                    if (type === AUTH_FAILURE) {
-                        this.setState({
-                            error: payload.authFailure
-                        });
-                    } else if (type === AUTH_SUCCESSFUL) {
-                        router.push(urls.home());
+            loginUser(email, password)
+                .catch((error) => {
+                    const errorCode = error.code;
+
+                    let errorTarget;
+                    let errorMessage;
+
+                    if (errorCode === 'auth/invalid-email') {
+                        errorTarget = 'email';
+                        errorMessage = 'The entered email is invalid!';
+                    } else if (errorCode === 'auth/wrong-password') {
+                        errorTarget = 'password';
+                        errorMessage = 'The entered password is invalid!';
+                    } else if (errorCode === 'auth/user-not-found') {
+                        errorTarget = 'email';
+                        errorMessage = 'The entered email is not a user!';
+                    } else {
+                        errorTarget = 'email';
+                        errorMessage = 'Could not auth at this time. Please try again later!';
                     }
+
+                    this.setState({
+                        error: {
+                            target: errorTarget,
+                            message: errorMessage
+                        }
+                    });
                 });
         }
     };
@@ -120,12 +140,8 @@ class AuthPage extends React.PureComponent {
     };
 
     render() {
-        const { classes, user, router } = this.props;
+        const { classes } = this.props;
         const { email, password, error, isRegistering, success, termsOpen } = this.state;
-
-        if (_.isObject(user)) {
-            router.push(urls.home());
-        }
 
         return (
             <Card>
@@ -218,24 +234,7 @@ class AuthPage extends React.PureComponent {
 }
 
 AuthPage.propTypes = {
-    classes: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired,
-    router: PropTypes.object.isRequired,
-    user: PropTypes.object
+    classes: PropTypes.object.isRequired
 };
 
-AuthPage.defaultProps = {
-    user: null
-};
-
-const styledPage = withRouter(withStyles(styles)(AuthPage));
-
-export default connect(
-    (state) => {
-        const { auth } = state;
-
-        return {
-            user: _.get(auth, 'user')
-        };
-    }
-)(withRouter(styledPage));
+export default withStyles(styles)(AuthPage);

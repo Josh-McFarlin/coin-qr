@@ -43,6 +43,11 @@ nextApp.prepare().then(() => {
 
 
     server.get('/login', csrfProtection, (req, res, cont) => {
+        if (_.has(req, 'cookies.session')) {
+            res.redirect('back');
+            return;
+        }
+
         res.cookie('csrfToken', req.csrfToken());
 
         cont();
@@ -84,6 +89,24 @@ nextApp.prepare().then(() => {
             });
     });
 
+    server.use((req, res, cont) => {
+        if (req.url.match(/\/edit\/?$/g)) {
+            console.log(req.url)
+            console.log('ends with edit!')
+            console.log('~~~~')
+
+            res.locals.otherData = 'IT WORKS!'
+            res.otherData = 'IT WORKS!'
+        }
+
+        cont();
+    });
+
+    server.post('/sessionLogout', (req, res) => {
+        res.clearCookie('session');
+        res.redirect('/');
+    });
+
     server.get('/test', (req, res) => {
         const sessionCookie = _.get(req, 'cookies.session', '');
 
@@ -99,11 +122,6 @@ nextApp.prepare().then(() => {
             .catch(() => {
                 res.redirect('/login');
             });
-    });
-
-    server.get('/sessionLogout', (req, res) => {
-        res.clearCookie('session');
-        res.redirect('/');
     });
 
 
