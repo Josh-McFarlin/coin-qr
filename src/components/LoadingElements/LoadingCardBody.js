@@ -6,9 +6,6 @@ import { CardBody } from 'shards-react';
 
 
 const styles = () => ({
-    card: {
-
-    },
     loading: {
         display: 'flex',
         justifyContent: 'center',

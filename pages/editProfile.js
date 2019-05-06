@@ -12,7 +12,7 @@ import Error from './_error';
 import firebase from '../src/firebase';
 import { fetchProfile, fetchRecent, fetchPage } from '../src/redux/actions';
 import { FETCH_PROFILE_FAILURE } from '../src/redux/actions/profiles/types';
-import AddressListViewer from '../src/components/AddressList/AddressListViewer';
+import AddressListEditor from '../src/components/AddressList/AddressListEditor';
 import PageSection from '../src/components/PageSection/PageSection';
 import LoadingCardBody from '../src/components/LoadingElements/LoadingCardBody';
 import noProfilePic from '../static/images/noProfilePic.png';
@@ -61,7 +61,7 @@ const styles = () => ({
     }
 });
 
-class ViewProfilePage extends React.PureComponent {
+class EditProfilePage extends React.PureComponent {
     constructor(props) {
         super(props);
 
@@ -187,7 +187,7 @@ class ViewProfilePage extends React.PureComponent {
         );
 
         const addressSection = (
-            <AddressListViewer
+            <AddressListEditor
                 className={classes.fullHeight}
                 addresses={_.get(profile, 'data.addresses.addresses')}
             />
@@ -297,7 +297,7 @@ class ViewProfilePage extends React.PureComponent {
     }
 }
 
-ViewProfilePage.propTypes = {
+EditProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -306,13 +306,13 @@ ViewProfilePage.propTypes = {
     recentPages: PropTypes.array
 };
 
-ViewProfilePage.defaultProps = {
+EditProfilePage.defaultProps = {
     profile: null,
     featuredPage: null,
     recentPages: null
 };
 
-const styledPage = withRouter(withStyles(styles)(ViewProfilePage));
+const styledPage = withRouter(withStyles(styles)(EditProfilePage));
 
 export default connect((state) => {
     const { profiles, pages } = state;

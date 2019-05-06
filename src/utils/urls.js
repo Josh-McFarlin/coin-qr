@@ -1,6 +1,6 @@
 export default {
     home: () => '/',
-    auth: () => '/auth',
+    auth: () => '/login',
     recent: () => '/recent',
     qr: {
         create: () => '/qr',

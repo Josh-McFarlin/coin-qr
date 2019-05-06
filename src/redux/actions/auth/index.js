@@ -1,3 +1,5 @@
+import Cookies from 'universal-cookie';
+
 import {
     AUTH_SUCCESSFUL,
     AUTH_FAILURE,
@@ -10,7 +12,37 @@ import firebase from '../../../firebase/index';
 
 
 export const registerNewUser = (email, password) => (dispatch) =>
-    firebase.auth().createUserWithEmailAndPassword(email, password)
+    firebase.auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then((user) => {
+            const cookies = new Cookies();
+            const csrfToken = cookies.get('csrfToken');
+
+            console.log('cookies', cookies.getAll())
+
+            user.user.getIdToken()
+                .then((idToken) => {
+                    console.log('posting user')
+                    console.log('idToken', idToken)
+                    console.log('csrfToken', csrfToken)
+
+                    fetch('/sessionLogin', {
+                        method: 'post',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            idToken,
+                            csrfToken
+                        })
+                    }).then((resp) => {
+                        console.log('resp', resp)
+                    })
+                });
+
+            return user;
+        })
         .then((user) => dispatch({
             type: AUTH_SUCCESSFUL,
             payload: user
@@ -49,7 +81,40 @@ export const registerNewUser = (email, password) => (dispatch) =>
         });
 
 export const loginUser = (email, password) => (dispatch) =>
-    firebase.auth().signInWithEmailAndPassword(email, password)
+    firebase.auth()
+        .signInWithEmailAndPassword(email, password)
+        .then((user) => {
+            const cookies = new Cookies();
+            const csrfToken = cookies.get('csrfToken');
+
+            console.log('cookies', cookies.getAll())
+
+            user.user.getIdToken()
+                .then(async (idToken) => {
+                    console.log('posting user')
+                    console.log('idToken', idToken)
+                    console.log('csrfToken', csrfToken)
+
+                    await fetch('/sessionLogin', {
+                        method: 'post',
+                        mode: 'same-origin',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            idToken,
+                            csrfToken
+                        })
+                    });
+                })
+                .then(() => firebase.auth().signOut())
+                .then(() => {
+                    window.location.assign('/profile');
+                });
+
+            return user;
+        })
         .then((user) =>
             dispatch({
                 type: AUTH_SUCCESSFUL,
@@ -89,30 +154,32 @@ export const loginUser = (email, password) => (dispatch) =>
         });
 
 export const listenForUser = () => (dispatch) =>
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
+    firebase.auth()
+        .onAuthStateChanged((user) => {
+            if (user) {
+                const newState = {
+                    user
+                };
+
+                return dispatch({
+                    type: AUTH_SUCCESSFUL,
+                    payload: newState
+                });
+            }
+
             const newState = {
-                user
+                user: null
             };
 
             return dispatch({
-                type: AUTH_SUCCESSFUL,
+                type: AUTH_FAILURE,
                 payload: newState
             });
-        }
-
-        const newState = {
-            user: null
-        };
-
-        return dispatch({
-            type: AUTH_FAILURE,
-            payload: newState
         });
-    });
 
 export const signOut = () => (dispatch) =>
-    firebase.auth().signOut()
+    firebase.auth()
+        .signOut()
         .then(() => dispatch({
             type: SIGN_OUT_SUCCESSFUL
         }))
@@ -121,7 +188,8 @@ export const signOut = () => (dispatch) =>
         }));
 
 export const resetPassword = (email) => (dispatch) =>
-    firebase.auth().sendPasswordResetEmail(email)
+    firebase.auth()
+        .sendPasswordResetEmail(email)
         .then(() => dispatch({
             type: RESET_PASSWORD_SUCCESSFUL
         }))

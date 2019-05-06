@@ -1,10 +1,10 @@
-import * as firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/storage';
-import 'firebase/firestore';
+const admin = require('firebase-admin');
+
+const serviceAccount = require('../admin-credentials.json');
 
 
 const config = {
+    credential: admin.credential.cert(serviceAccount),
     apiKey: 'AIzaSyCOxxu5T3uuy6ySoI5pOSb3mza739pIUV4',
     authDomain: 'crypto-qr.firebaseapp.com',
     databaseURL: 'https://crypto-qr.firebaseio.com',
@@ -13,10 +13,8 @@ const config = {
     messagingSenderId: '444062320028'
 };
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(config);
-
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+if (!admin.apps.length) {
+    admin.initializeApp(config);
 }
 
-export default firebase;
+module.exports = admin;
