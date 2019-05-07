@@ -49,7 +49,7 @@ const QRCode = ({ classes, modalOpen, modalInfo, closeModal }) => {
     return (
         <Modal
             open={modalOpen}
-            size='md'
+            size='lg'
             toggle={closeModal}
         >
             <ModalHeader

@@ -1,16 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
-import { withRouter } from 'next/router';
 import _ from 'lodash';
-import { Card, CardHeader, Row, Col, ListGroup } from 'shards-react';
-import { isMobile } from 'react-device-detect';
+import { Card, CardHeader, CardBody, Col, ListGroup, Row } from 'shards-react';
 
 import Error from './_error';
-import { fetchProfile, fetchRecent, fetchPage } from '../frontend/firebase/actions';
-import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
+import AddressListViewer
+    from '../frontend/components/AddressList/AddressListViewer';
 import PageSection from '../frontend/components/PageSection/PageSection';
-import LoadingCardBody from '../frontend/components/LoadingElements/LoadingCardBody';
 import noProfilePic from '../static/images/noProfilePic.png';
 
 
@@ -62,66 +59,18 @@ const styles = () => ({
 
 class ViewProfilePage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
-        const locals = _.get(res, 'locals', {});
+        const { error, profile, featuredPage, recentPages } = _.get(res, 'locals', {});
 
         return {
-            myUserId: locals.userId
+            error,
+            profile,
+            featuredPage,
+            recentPages
         };
     }
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            error: null,
-            profile: null,
-            featuredPage: null,
-            recentPages: []
-        };
-    }
-
-    componentDidMount() {
-        const { router } = this.props;
-        const profileId = _.get(router, 'query.id');
-
-        fetchProfile(profileId)
-            .then((profile) => {
-                this.setState({
-                    profile
-                });
-
-                const featured = _.get(profile, 'data.featuredPage');
-
-                if (_.isString(featured) && !_.isEmpty(featured)) {
-                    fetchPage(featured)
-                        .then((featuredPage) => {
-                            this.setState({
-                                featuredPage
-                            });
-                        });
-                }
-
-                fetchRecent(profile.userId)
-                    .then((recentPages) => {
-                        this.setState({
-                            recentPages
-                        });
-                    });
-            })
-            .catch(() => {
-                this.setState({
-                    error: {
-                        message: 'Profile Page Not Found',
-                        statusCode: 404
-                    }
-                });
-            });
-    }
-
 
     render() {
-        const { classes } = this.props;
-        const { error, profile, featuredPage, recentPages } = this.state;
+        const { classes, error, profile, featuredPage, recentPages, isMobile } = this.props;
 
         if (_.isObject(error)) {
             return (
@@ -137,7 +86,7 @@ class ViewProfilePage extends React.PureComponent {
                 <CardHeader className={classes.header}>
                     Profile
                 </CardHeader>
-                <LoadingCardBody isLoading={_.isNil(profile)}>
+                <CardBody>
                     <Row className={classes.rowNoPadding}>
                         <Col sm={2}>
                             <Row>
@@ -161,7 +110,7 @@ class ViewProfilePage extends React.PureComponent {
                             {_.get(profile, 'data.bio')}
                         </Col>
                     </Row>
-                </LoadingCardBody>
+                </CardBody>
             </Card>
         );
 
@@ -173,27 +122,24 @@ class ViewProfilePage extends React.PureComponent {
         );
 
         const featuredSection = (
-            <Card className={classes.fullHeight}>
+            <Card>
                 <CardHeader className={classes.header}>
                     Featured Page
                 </CardHeader>
-                <LoadingCardBody isLoading={_.isNil(featuredPage)}>
+                <CardBody>
                     <ListGroup>
                         <PageSection page={featuredPage} />
                     </ListGroup>
-                </LoadingCardBody>
+                </CardBody>
             </Card>
         );
 
-        const otherSection = (
+        const recentSection = (
             <Card className={classes.fullHeight}>
                 <CardHeader className={classes.header}>
                     Recent Pages
                 </CardHeader>
-                <LoadingCardBody
-                    className={classes.scrollBody}
-                    isLoading={_.isNil(recentPages)}
-                >
+                <CardBody className={classes.scrollBody}>
                     <ListGroup>
                         {_.map(recentPages, (page, index) => (
                             <PageSection
@@ -202,7 +148,7 @@ class ViewProfilePage extends React.PureComponent {
                             />
                         ))}
                     </ListGroup>
-                </LoadingCardBody>
+                </CardBody>
             </Card>
         );
 
@@ -227,7 +173,7 @@ class ViewProfilePage extends React.PureComponent {
                         </Row>
                         <Row>
                             <Col>
-                                {otherSection}
+                                {recentSection}
                             </Col>
                         </Row>
                     </Col>
@@ -258,7 +204,7 @@ class ViewProfilePage extends React.PureComponent {
                         </Row>
                         <Row className={classes.flexFill}>
                             <Col className={classes.fullHeight}>
-                                {otherSection}
+                                {recentSection}
                             </Col>
                         </Row>
                     </Col>
@@ -270,7 +216,15 @@ class ViewProfilePage extends React.PureComponent {
 
 ViewProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired
+    profile: PropTypes.object.isRequired,
+    featuredPage: PropTypes.object.isRequired,
+    recentPages: PropTypes.array.isRequired,
+    isMobile: PropTypes.bool.isRequired,
+    error: PropTypes.object
 };
 
-export default withRouter(withStyles(styles)(ViewProfilePage));
+ViewProfilePage.defaultProps = {
+    error: undefined
+};
+
+export default withStyles(styles)(ViewProfilePage);

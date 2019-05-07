@@ -1,18 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
-import { withRouter } from 'next/router';
 import _ from 'lodash';
-import { Card, CardHeader, Row, Col, ListGroup } from 'shards-react';
-import { isMobile } from 'react-device-detect';
-import shortHash from 'short-hash';
+import {
+    Card, CardHeader, CardBody, Row, Col, ListGroup,
+    Form, FormGroup, FormInput, FormTextarea, FormFeedback
+} from 'shards-react';
 
 import Error from './_error';
-import firebase from '../frontend/firebase';
-import { fetchProfile, fetchRecent, fetchPage } from '../frontend/firebase/actions';
 import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
 import PageSection from '../frontend/components/PageSection/PageSection';
-import LoadingCardBody from '../frontend/components/LoadingElements/LoadingCardBody';
 import noProfilePic from '../static/images/noProfilePic.png';
 
 
@@ -41,13 +38,16 @@ const styles = () => ({
         flex: 1
     },
     profileName: {
-        textAlign: 'center'
+        padding: 0
+    },
+    profileCol: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     profilePicture: {
         width: '100%',
         maxWidth: 150,
-        marginLeft: 'auto',
-        marginRight: 'auto',
         borderRadius: '50%'
     },
     scrollBody: {
@@ -56,85 +56,28 @@ const styles = () => ({
     },
     rowNoPadding: {
         paddingBottom: '0 !important'
+    },
+    noMarginBottom: {
+        marginBottom: 0
     }
 });
 
 class EditProfilePage extends React.PureComponent {
-    constructor(props) {
-        super(props);
+    static async getInitialProps({ query, res }) {
+        const { error, profile, featuredPage, recentPages } = _.get(res, 'locals', {});
 
-        this.state = {
-            error: null
+        return {
+            error,
+            profile,
+            featuredPage,
+            recentPages
         };
     }
 
-    componentDidMount() {
-        const { dispatch, router } = this.props;
-
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                let profileId = _.get(router, 'query.id');
-                const userId = _.get(user, 'uid');
-
-                if (_.isNil(profileId) && _.isString(userId)) {
-                    profileId = shortHash(userId);
-                }
-
-                if (_.isString(userId)) {
-                    dispatch(fetchRecent(userId));
-                }
-
-                if (_.isString(profileId)) {
-                    dispatch(fetchProfile(profileId))
-                        .then(({ type, payload }) => {
-                            if (type === FETCH_PROFILE_FAILURE) {
-                                this.setState({
-                                    error: {
-                                        message: 'Profile Page Not Found',
-                                        statusCode: 404
-                                    }
-                                });
-                            }
-
-                            return payload;
-                        })
-                        .then(({ profile }) => {
-                            const featured = _.get(profile, 'data.featuredPage.featuredPage');
-
-                            if (_.isString(featured) && _.get(profile, 'data.featuredPage.public', false)) {
-                                dispatch(fetchPage(featured));
-                            }
-                        })
-                        .catch(() => {
-                            this.setState({
-                                error: {
-                                    message: 'Profile Page Not Found',
-                                    statusCode: 404
-                                }
-                            });
-                        });
-                } else {
-                    this.setState({
-                        error: {
-                            message: 'Profile Page Not Found',
-                            statusCode: 404
-                        }
-                    });
-                }
-            } else {
-                this.setState({
-                    error: {
-                        message: 'You must be signed in before viewing your profile page!',
-                        statusCode: 400
-                    }
-                });
-            }
-        });
-    }
-
     render() {
-        const { classes, profile, featuredPage, recentPages } = this.props;
-        const { error } = this.state;
+        const { classes, error, profile, featuredPage, recentPages, isMobile } = this.props;
+
+        // console.log('props', this.props)
 
         if (_.isObject(error)) {
             return (
@@ -150,44 +93,50 @@ class EditProfilePage extends React.PureComponent {
                 <CardHeader className={classes.header}>
                     Profile
                 </CardHeader>
-                <LoadingCardBody isLoading={_.isNil(profile)}>
+                <CardBody>
                     <Row className={classes.rowNoPadding}>
                         <Col sm={2}>
-                            {_.get(profile, 'data.name.public', false) && (
-                                <Row>
-                                    <Col className={classes.profileName}>
-                                        <b>
-                                            {_.get(profile, 'data.name.name')}
-                                        </b>
-                                    </Col>
-                                </Row>
-                            )}
-                            {_.get(profile, 'data.picture.public', false) && (
-                                <Row className={classes.rowNoPadding}>
-                                    <Col>
-                                        <img
-                                            className={classes.profilePicture}
-                                            src={_.get(profile, 'data.picture.picture', noProfilePic)}
-                                            alt='Profile'
+                            <Row>
+                                <Col className={classes.profileName}>
+                                    <FormGroup className={classes.noMarginBottom}>
+                                        <label htmlFor='title'>Name</label>
+                                        <FormInput
+                                            id='name'
+                                            // onChange={this.handleChange}
+                                            value={_.get(profile, 'data.name')}
                                         />
-                                    </Col>
-                                </Row>
-                            )}
+                                    </FormGroup>
+                                </Col>
+                            </Row>
+                            <Row className={classes.rowNoPadding}>
+                                <Col className={classes.profileCol}>
+                                    <img
+                                        className={classes.profilePicture}
+                                        src={_.get(profile, 'data.picture', noProfilePic)}
+                                        alt='Profile'
+                                    />
+                                </Col>
+                            </Row>
                         </Col>
-                        {_.get(profile, 'data.bio.public', false) && (
-                            <Col sm={10}>
-                                {_.get(profile, 'data.bio.bio')}
-                            </Col>
-                        )}
+                        <Col sm={10}>
+                            <FormGroup>
+                                <label htmlFor='caption'>Bio</label>
+                                <FormTextarea
+                                    id='bio'
+                                    // onChange={this.handleChange}
+                                    value={_.get(profile, 'data.bio', '')}
+                                />
+                            </FormGroup>
+                        </Col>
                     </Row>
-                </LoadingCardBody>
+                </CardBody>
             </Card>
         );
 
         const addressSection = (
             <AddressListEditor
                 className={classes.fullHeight}
-                addresses={_.get(profile, 'data.addresses.addresses')}
+                addresses={_.get(profile, 'data.addresses', [])}
             />
         );
 
@@ -196,11 +145,11 @@ class EditProfilePage extends React.PureComponent {
                 <CardHeader className={classes.header}>
                     Featured Page
                 </CardHeader>
-                <LoadingCardBody isLoading={_.isNil(featuredPage)}>
+                <CardBody>
                     <ListGroup>
                         <PageSection page={featuredPage} />
                     </ListGroup>
-                </LoadingCardBody>
+                </CardBody>
             </Card>
         );
 
@@ -209,10 +158,7 @@ class EditProfilePage extends React.PureComponent {
                 <CardHeader className={classes.header}>
                     Recent Pages
                 </CardHeader>
-                <LoadingCardBody
-                    className={classes.scrollBody}
-                    isLoading={_.isNil(recentPages)}
-                >
+                <CardBody className={classes.scrollBody}>
                     <ListGroup>
                         {_.map(recentPages, (page, index) => (
                             <PageSection
@@ -221,7 +167,7 @@ class EditProfilePage extends React.PureComponent {
                             />
                         ))}
                     </ListGroup>
-                </LoadingCardBody>
+                </CardBody>
             </Card>
         );
 
@@ -234,20 +180,16 @@ class EditProfilePage extends React.PureComponent {
                                 {profileSection}
                             </Col>
                         </Row>
-                        {_.get(profile, 'data.featuredPage.public', false) && (
-                            <Row>
-                                <Col>
-                                    {featuredSection}
-                                </Col>
-                            </Row>
-                        )}
-                        {_.get(profile, 'data.addresses.public', false) && (
-                            <Row>
-                                <Col>
-                                    {addressSection}
-                                </Col>
-                            </Row>
-                        )}
+                        <Row>
+                            <Col>
+                                {featuredSection}
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                {addressSection}
+                            </Col>
+                        </Row>
                         <Row>
                             <Col>
                                 {otherSection}
@@ -267,22 +209,18 @@ class EditProfilePage extends React.PureComponent {
                                 {profileSection}
                             </Col>
                         </Row>
-                        {_.get(profile, 'data.addresses.public', false) && (
-                            <Row className={classes.flexFill}>
-                                <Col>
-                                    {addressSection}
-                                </Col>
-                            </Row>
-                        )}
+                        <Row className={classes.flexFill}>
+                            <Col>
+                                {addressSection}
+                            </Col>
+                        </Row>
                     </Col>
                     <Col sm={4} className={`${classes.fullHeight} ${classes.flexColumn}`}>
-                        {_.get(profile, 'data.featuredPage.public', false) && (
-                            <Row>
-                                <Col>
-                                    {featuredSection}
-                                </Col>
-                            </Row>
-                        )}
+                        <Row>
+                            <Col>
+                                {featuredSection}
+                            </Col>
+                        </Row>
                         <Row className={classes.flexFill}>
                             <Col className={classes.fullHeight}>
                                 {otherSection}
@@ -297,17 +235,14 @@ class EditProfilePage extends React.PureComponent {
 
 EditProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-    dispatch: PropTypes.func.isRequired,
-    profile: PropTypes.object,
-    featuredPage: PropTypes.object,
-    recentPages: PropTypes.array
+    profile: PropTypes.object.isRequired,
+    featuredPage: PropTypes.object.isRequired,
+    recentPages: PropTypes.array.isRequired,
+    error: PropTypes.object
 };
 
 EditProfilePage.defaultProps = {
-    profile: null,
-    featuredPage: null,
-    recentPages: null
+    error: undefined
 };
 
-export default withRouter(withStyles(styles)(EditProfilePage));
+export default withStyles(styles)(EditProfilePage);

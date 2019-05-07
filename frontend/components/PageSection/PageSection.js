@@ -1,12 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
-import { withRouter } from 'next/router';
 import _ from 'lodash';
-import {
-    Button, Card, CardBody, CardHeader, CardFooter, Row, Col,
-    Form, FormGroup, FormInput, FormTextarea, FormFeedback, ListGroup, ListGroupItem
-} from 'shards-react';
+import { ListGroupItem } from 'shards-react';
 
 import urls from '../../../utils/urls';
 
@@ -17,25 +13,27 @@ const styles = () => ({
     }
 });
 
-const PageSection = ({ classes, page, router }) => (
-    <ListGroupItem
-        className={classes.section}
-        onClick={() => router.push(urls.qr.view(_.get(page, 'id')))}
-    >
-        {_.get(page, 'data.title')}
-    </ListGroupItem>
-);
+const PageSection = ({ classes, page }) => {
+    if (_.isNil(page)) return null;
+
+    return (
+        <ListGroupItem
+            className={classes.section}
+            href={urls.qr.view(_.get(page, 'id'))}
+            tag='a'
+        >
+            {_.get(page, 'data.title')}
+        </ListGroupItem>
+    );
+};
 
 PageSection.propTypes = {
     classes: PropTypes.object.isRequired,
-    page: PropTypes.object,
-    router: PropTypes.object.isRequired
+    page: PropTypes.object
 };
 
 PageSection.defaultProps = {
     page: null
 };
 
-export default withStyles(styles)(
-    withRouter(PageSection)
-);
+export default withStyles(styles)(PageSection);

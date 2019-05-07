@@ -1,2 +1,2 @@
-exports.pages = require('./pages');
-exports.profiles = require('./profiles');
+module.exports.pages = require('./pages');
+module.exports.profiles = require('./profiles');

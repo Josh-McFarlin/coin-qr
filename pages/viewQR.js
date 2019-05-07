@@ -6,7 +6,6 @@ import _ from 'lodash';
 import {
     Card, CardHeader, Row, Col, Button, ButtonGroup
 } from 'shards-react';
-import { isMobile } from 'react-device-detect';
 
 import AddressQRCode from '../frontend/components/AddressList/QRCode';
 import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
@@ -96,7 +95,7 @@ class ViewPage extends React.PureComponent {
     };
 
     render() {
-        const { classes, postId, userId } = this.props;
+        const { classes, postId, userId, isMobile } = this.props;
         const { error, modalOpen, page } = this.state;
 
         if (_.has(error, 'statusCode')) {
@@ -178,6 +177,7 @@ class ViewPage extends React.PureComponent {
 ViewPage.propTypes = {
     classes: PropTypes.object.isRequired,
     postId: PropTypes.string.isRequired,
+    isMobile: PropTypes.bool.isRequired,
     userId: PropTypes.string
 };
 

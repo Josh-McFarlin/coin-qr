@@ -7,8 +7,8 @@ import {
     Button, Card, CardBody, CardHeader, CardFooter, Row, Col,
     Form, FormGroup, FormInput, FormTextarea, FormFeedback
 } from 'shards-react';
+import classNames from 'classnames';
 
-import { isMobile } from 'react-device-detect';
 import Error from './_error';
 import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
 import DeleteDialog from '../frontend/components/AddressList/DeleteDialog';
@@ -30,9 +30,6 @@ const styles = () => ({
     fullHeight: {
         height: '100%'
     },
-    fullDesktopHeight: {
-        height: isMobile ? 'unset' : '100%'
-    },
     flexColumn: {
         display: 'flex',
         flexDirection: 'column'
@@ -43,7 +40,7 @@ const styles = () => ({
 });
 
 class EditPage extends React.PureComponent {
-    static async getInitialProps({ query, res }) {
+    static async getInitialProps({ query, req, res }) {
         const locals = _.get(res, 'locals', {});
         const postId = _.get(query, 'id');
 
@@ -161,7 +158,7 @@ class EditPage extends React.PureComponent {
     };
 
     render() {
-        const { classes, newPage } = this.props;
+        const { classes, newPage, isMobile } = this.props;
         const { data, error, showDelete, goToError } = this.state;
 
         if (_.isObject(goToError)) {
@@ -175,7 +172,7 @@ class EditPage extends React.PureComponent {
 
         return (
             <Row className={classes.fullHeight}>
-                <Col className={`${classes.fullDesktopHeight} ${classes.flexColumn}`}>
+                <Col className={classNames(classes.flexColumn, { [classes.fullHeight]: !isMobile })}>
                     <Row>
                         <Col>
                             <Card>
@@ -215,7 +212,7 @@ class EditPage extends React.PureComponent {
                     </Row>
 
                     <Row className={classes.flexFill}>
-                        <Col className={classes.fullDesktopHeight}>
+                        <Col className={classNames({ [classes.fullHeight]: !isMobile })}>
                             <AddressListEditor
                                 className={classes.fullHeight}
                                 addresses={data.addresses}
@@ -263,6 +260,7 @@ EditPage.propTypes = {
     classes: PropTypes.object.isRequired,
     postId: PropTypes.string.isRequired,
     router: PropTypes.object.isRequired,
+    isMobile: PropTypes.bool.isRequired,
     userId: PropTypes.string,
     newPage: PropTypes.bool
 };

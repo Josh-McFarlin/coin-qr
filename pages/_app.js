@@ -5,6 +5,7 @@ import Head from 'next/head';
 import JssProvider from 'react-jss/lib/JssProvider';
 import withStyles, { ThemeProvider } from 'react-jss';
 import { Container } from 'shards-react';
+import MobileDetect from 'mobile-detect';
 
 import PageContext from '../frontend/utils/pageContext';
 import NavBar from '../frontend/components/NavBar/NavBar';
@@ -22,7 +23,7 @@ const styles = (theme) => ({
 
 class AppContent extends React.PureComponent {
     render() {
-        const { classes, Component, pageContext, pageProps } = this.props;
+        const { classes, Component, pageContext, pageProps, isMobile } = this.props;
 
         return (
             <React.Fragment>
@@ -33,6 +34,7 @@ class AppContent extends React.PureComponent {
                 >
                     <Component
                         pageContext={pageContext}
+                        isMobile={isMobile}
                         {...pageProps}
                     />
                 </Container>
@@ -45,17 +47,28 @@ AppContent.propTypes = {
     classes: PropTypes.object.isRequired,
     Component: PropTypes.any.isRequired,
     pageContext: PropTypes.object.isRequired,
-    pageProps: PropTypes.object.isRequired
+    pageProps: PropTypes.object.isRequired,
+    isMobile: PropTypes.bool.isRequired
 };
 
 const StyledContent = withStyles(styles)(AppContent);
 
 export default class MyApp extends App {
     static async getInitialProps({ Component, ctx }) {
+        let pageProps = {};
+
+        if (Component.getInitialProps) {
+            pageProps = await Component.getInitialProps(ctx);
+        }
+
+        const md = ctx.req ? new MobileDetect(ctx.req.headers['user-agent']) :
+            new MobileDetect(navigator.userAgent);
+
+        const isMobile = md.mobile() != null;
+
         return {
-            pageProps: {
-                ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {})
-            }
+            pageProps,
+            isMobile
         };
     }
 
@@ -74,7 +87,7 @@ export default class MyApp extends App {
     }
 
     render() {
-        const { Component, pageProps } = this.props;
+        const { Component, pageProps, isMobile } = this.props;
 
         return (
             <AppContainer>
@@ -90,6 +103,7 @@ export default class MyApp extends App {
                             Component={Component}
                             pageContext={this.pageContext}
                             pageProps={pageProps}
+                            isMobile={isMobile}
                         />
                     </ThemeProvider>
                 </JssProvider>

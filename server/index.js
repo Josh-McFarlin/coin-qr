@@ -122,6 +122,40 @@ nextApp.prepare().then(() => {
         cont();
     });
 
+    server.get('/profile/:profileId/:optional*?', async (req, res, cont) => {
+        const profileId = _.get(req, 'params.profileId');
+
+        await firebaseActions.profiles.fetchProfile(profileId)
+            .then(async (profile) => {
+                res.locals.profile = profile;
+
+                await firebaseActions.pages.fetchRecent(profile.userId)
+                    .then((recentPages) => {
+                        res.locals.recentPages = recentPages;
+                    });
+
+                const featured = _.defaultTo(
+                    _.get(profile, 'data.featuredPage'),
+                    _.get(res, 'locals.recentPages[0].owner')
+                );
+
+                if (_.isString(featured) && !_.isEmpty(featured)) {
+                    await firebaseActions.pages.fetchPage(featured)
+                        .then((featuredPage) => {
+                            res.locals.featuredPage = featuredPage;
+                        });
+                }
+            })
+            .catch((error) => {
+                res.locals.error = {
+                    message: 'Profile Page Not Found',
+                    statusCode: 404
+                };
+            });
+
+        cont();
+    });
+
     server.get('/myprofile', async (req, res, cont) => {
         const sessionCookie = _.get(req, 'cookies.session', '');
 
