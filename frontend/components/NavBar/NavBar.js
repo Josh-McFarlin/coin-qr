@@ -3,13 +3,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
 import { withRouter } from 'next/router';
 import {
-    Navbar,
-    NavbarToggler,
-    NavbarBrand,
-    Nav,
-    NavItem,
-    NavLink,
-    Collapse
+    Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink, Collapse
 } from 'shards-react';
 import _ from 'lodash';
 
@@ -56,7 +50,7 @@ class NavBar extends React.PureComponent {
     };
 
     render() {
-        const { classes, router, user } = this.props;
+        const { classes, router, userId } = this.props;
         const { drawerOpen, termsOpen } = this.state;
 
         return (
@@ -87,7 +81,7 @@ class NavBar extends React.PureComponent {
                                     Recent Pages
                                 </NavLink>
                             </NavItem>
-                            {_.isObject(user) && (
+                            {_.isString(userId) && (
                                 <NavItem className={classes.navItem}>
                                     <NavLink
                                         active={router.asPath === urls.myProfile.view()}
@@ -106,7 +100,7 @@ class NavBar extends React.PureComponent {
                                     Terms
                                 </NavLink>
                             </NavItem>
-                            {_.isNil(user) && (
+                            {_.isNil(userId) && (
                                 <NavItem className={classes.navItem}>
                                     <NavLink
                                         active={router.asPath === urls.auth()}
@@ -116,7 +110,7 @@ class NavBar extends React.PureComponent {
                                     </NavLink>
                                 </NavItem>
                             )}
-                            {_.isObject(user) && (
+                            {_.isString(userId) && (
                                 <NavItem className={classes.navItem}>
                                     <NavLink
                                         onClick={this.handleSignout}
@@ -141,7 +135,7 @@ class NavBar extends React.PureComponent {
 NavBar.propTypes = {
     classes: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
-    user: PropTypes.object
+    userId: PropTypes.string
 };
 
 NavBar.defaultProps = {

@@ -11,6 +11,7 @@ import PageContext from '../frontend/utils/pageContext';
 import NavBar from '../frontend/components/NavBar/NavBar';
 import 'bootstrap-css-only';
 import 'shards-ui/dist/css/shards.min.css';
+import _ from 'lodash';
 
 
 const styles = (theme) => ({
@@ -23,11 +24,11 @@ const styles = (theme) => ({
 
 class AppContent extends React.PureComponent {
     render() {
-        const { classes, Component, pageContext, pageProps, isMobile } = this.props;
+        const { classes, Component, pageContext, pageProps, isMobile, userId } = this.props;
 
         return (
             <React.Fragment>
-                <NavBar />
+                <NavBar userId={userId} />
                 <Container
                     className={classes.content}
                     fluid
@@ -48,13 +49,20 @@ AppContent.propTypes = {
     Component: PropTypes.any.isRequired,
     pageContext: PropTypes.object.isRequired,
     pageProps: PropTypes.object.isRequired,
-    isMobile: PropTypes.bool.isRequired
+    isMobile: PropTypes.bool.isRequired,
+    userId: PropTypes.string
+};
+
+AppContent.defaultProps = {
+    userId: null
 };
 
 const StyledContent = withStyles(styles)(AppContent);
 
 export default class MyApp extends App {
     static async getInitialProps({ Component, ctx }) {
+        const locals = _.get(ctx, 'res.locals', {});
+
         let pageProps = {};
 
         if (Component.getInitialProps) {
@@ -64,11 +72,10 @@ export default class MyApp extends App {
         const md = ctx.req ? new MobileDetect(ctx.req.headers['user-agent']) :
             new MobileDetect(navigator.userAgent);
 
-        const isMobile = md.mobile() != null;
-
         return {
             pageProps,
-            isMobile
+            isMobile: md.mobile() != null,
+            userId: locals.userId
         };
     }
 
@@ -87,7 +94,7 @@ export default class MyApp extends App {
     }
 
     render() {
-        const { Component, pageProps, isMobile } = this.props;
+        const { Component, pageProps, isMobile, userId } = this.props;
 
         return (
             <AppContainer>
@@ -104,6 +111,7 @@ export default class MyApp extends App {
                             pageContext={this.pageContext}
                             pageProps={pageProps}
                             isMobile={isMobile}
+                            userId={userId}
                         />
                     </ThemeProvider>
                 </JssProvider>

@@ -2,9 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
-import { ListGroupItem } from 'shards-react';
-
-import RemoveButton from './RemoveButton';
+import { ListGroupItem, Button } from 'shards-react';
 
 
 const styles = (theme) => ({
@@ -20,17 +18,6 @@ const styles = (theme) => ({
         overflow: 'hidden',
         textOverflow: 'ellipsis'
     },
-    removeButton: {
-        width: 32,
-        height: 32,
-        color: '#ffffff',
-        backgroundColor: '#3e3e3e',
-        borderRadius: '100%',
-        fontWeight: 'bolder',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
     qrHolder: {
         display: 'flex',
         flexDirection: 'column',
@@ -41,30 +28,21 @@ const styles = (theme) => ({
         marginTop: theme.spacing.unit,
         marginBottom: 0,
         textOverflow: 'ellipsis'
+    },
+    removeButton: {
+        width: 32,
+        height: 32,
+        padding: 0,
+        margin: 0,
+        borderRadius: '100%',
+        fontWeight: 'bolder',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 
 class CoinList extends React.PureComponent {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            fadeRemove: false
-        };
-    }
-
-    fadeIn = () => {
-        this.setState({
-            fadeRemove: true
-        });
-    };
-
-    fadeOut = () => {
-        this.setState({
-            fadeRemove: false
-        });
-    };
-
     handleAddressClick = () => {
         const { onAddressClick, address, coinType } = this.props;
 
@@ -76,7 +54,6 @@ class CoinList extends React.PureComponent {
 
     render() {
         const { classes, coinType, address, removeRow, editing } = this.props;
-        const { fadeRemove } = this.state;
 
         let imagePath;
         try {
@@ -90,8 +67,6 @@ class CoinList extends React.PureComponent {
                 <ListGroupItem
                     className={classes.listItem}
                     onClick={this.handleAddressClick}
-                    onMouseEnter={this.fadeIn}
-                    onMouseLeave={this.fadeOut}
                 >
                     {imagePath && (
                         <img
@@ -106,11 +81,15 @@ class CoinList extends React.PureComponent {
                         {address}
                     </div>
                     {(removeRow && editing) && (
-                        <RemoveButton
-                            classes={classes}
-                            fadeRemove={fadeRemove}
-                            removeRow={removeRow}
-                        />
+                        <Button
+                            className={classes.removeButton}
+                            outline
+                            pill
+                            theme='secondary'
+                            onClick={removeRow}
+                        >
+                            X
+                        </Button>
                     )}
                 </ListGroupItem>
             </React.Fragment>
