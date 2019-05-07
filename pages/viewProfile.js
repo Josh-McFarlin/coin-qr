@@ -2,12 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
 import _ from 'lodash';
-import { Card, CardHeader, CardBody, Col, ListGroup, Row } from 'shards-react';
+import {
+    Card,
+    CardHeader,
+    CardBody,
+    Col,
+    ListGroup,
+    Row,
+    Button
+} from 'shards-react';
 
 import Error from './_error';
 import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
 import PageSection from '../frontend/components/PageSection/PageSection';
 import noProfilePic from '../static/images/noProfilePic.png';
+import PageQRCode from '../frontend/components/AddressList/QRCode';
+import urls from '../utils/urls';
 
 
 const styles = () => ({
@@ -53,23 +63,41 @@ const styles = () => ({
     },
     rowNoPadding: {
         paddingBottom: '0 !important'
+    },
+    qrButton: {
+        float: 'right'
     }
 });
 
 class ViewProfilePage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
-        const { error, profile, featuredPage, recentPages } = _.get(res, 'locals', {});
+        const { error, profile, recentPages, userId } = _.get(res, 'locals', {});
 
         return {
             error,
             profile,
-            featuredPage,
-            recentPages
+            recentPages,
+            userId
         };
     }
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            modalOpen: false
+        };
+    }
+
+    toggleModal = () => {
+        this.setState((prevState) => ({
+            modalOpen: !prevState.modalOpen
+        }));
+    };
+
     render() {
-        const { classes, error, profile, featuredPage, recentPages, isMobile } = this.props;
+        const { classes, error, profile, recentPages, isMobile, userId } = this.props;
+        const { modalOpen } = this.state;
 
         if (_.isObject(error)) {
             return (
@@ -120,15 +148,39 @@ class ViewProfilePage extends React.PureComponent {
             />
         );
 
-        const featuredSection = (
+        const thisUrl = `${urls.base}${urls.profile.view(profile.profileId)}`;
+
+        const isOwner =
+            _.has(profile, 'userId')
+            && _.isString(userId)
+            && profile.userId === userId;
+
+        const buttonsSection = (
             <Card>
-                <CardHeader className={classes.header}>
-                    Featured Page
-                </CardHeader>
                 <CardBody>
-                    <ListGroup>
-                        <PageSection page={featuredPage} />
-                    </ListGroup>
+                    {isOwner && (
+                        <Button
+                            theme='primary'
+                            href={urls.myProfile.edit()}
+                        >
+                            Edit Profile
+                        </Button>
+                    )}
+                    <Button
+                        theme='primary'
+                        onClick={this.toggleModal}
+                        className={classes.qrButton}
+                    >
+                        View QR
+                    </Button>
+                    <PageQRCode
+                        modalOpen={modalOpen}
+                        modalInfo={{
+                            address: thisUrl,
+                            coinType: 'Page'
+                        }}
+                        closeModal={this.toggleModal}
+                    />
                 </CardBody>
             </Card>
         );
@@ -162,7 +214,7 @@ class ViewProfilePage extends React.PureComponent {
                         </Row>
                         <Row>
                             <Col>
-                                {featuredSection}
+                                {buttonsSection}
                             </Col>
                         </Row>
                         <Row>
@@ -198,7 +250,7 @@ class ViewProfilePage extends React.PureComponent {
                     <Col sm={4} className={`${classes.fullHeight} ${classes.flexColumn}`}>
                         <Row>
                             <Col>
-                                {featuredSection}
+                                {buttonsSection}
                             </Col>
                         </Row>
                         <Row className={classes.flexFill}>
@@ -216,14 +268,15 @@ class ViewProfilePage extends React.PureComponent {
 ViewProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
     profile: PropTypes.object.isRequired,
-    featuredPage: PropTypes.object.isRequired,
     recentPages: PropTypes.array.isRequired,
     isMobile: PropTypes.bool.isRequired,
-    error: PropTypes.object
+    error: PropTypes.object,
+    userId: PropTypes.string
 };
 
 ViewProfilePage.defaultProps = {
-    error: undefined
+    error: undefined,
+    userId: null
 };
 
 export default withStyles(styles)(ViewProfilePage);

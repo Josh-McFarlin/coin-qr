@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
 import {
-    Alert, Collapse, Card, CardHeader, ListGroup, Button, FormFeedback,
+    Alert, Collapse, Card, CardHeader, CardBody, ListGroup, Button, FormFeedback,
     Modal, ModalBody, ModalHeader, ModalFooter, Form, FormInput, FormGroup
 } from 'shards-react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -11,7 +11,6 @@ import _ from 'lodash';
 
 import AddressRow from './AddressRow';
 import AvailableCoins from '../../utils/availableCoins';
-import LoadingCardBody from '../LoadingElements/LoadingCardBody';
 
 
 const styles = (theme) => ({
@@ -143,10 +142,7 @@ class AddressListEditor extends React.PureComponent {
                             {_.get(error, 'message')}
                         </Alert>
                     </Collapse>
-                    <LoadingCardBody
-                        className={classes.body}
-                        isLoading={_.isNil(addresses)}
-                    >
+                    <CardBody className={classes.body}>
                         <DragDropContext onDragEnd={this.onDragEnd}>
                             <Droppable droppableId='droppable'>
                                 {(providedDrop) => (
@@ -184,7 +180,7 @@ class AddressListEditor extends React.PureComponent {
                                 )}
                             </Droppable>
                         </DragDropContext>
-                    </LoadingCardBody>
+                    </CardBody>
                 </Card>
 
                 <Modal

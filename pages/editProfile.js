@@ -64,18 +64,16 @@ const styles = () => ({
 
 class EditProfilePage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
-        const { error, profile, featuredPage, recentPages } = _.get(res, 'locals', {});
+        const { error, profile } = _.get(res, 'locals', {});
 
         return {
             error,
-            profile,
-            featuredPage,
-            recentPages
+            profile
         };
     }
 
     render() {
-        const { classes, error, profile, featuredPage, recentPages, isMobile } = this.props;
+        const { classes, error, profile, isMobile } = this.props;
 
         if (_.isObject(error)) {
             return (
@@ -138,95 +136,21 @@ class EditProfilePage extends React.PureComponent {
             />
         );
 
-        const featuredSection = (
-            <Card className={classes.fullHeight}>
-                <CardHeader className={classes.header}>
-                    Featured Page
-                </CardHeader>
-                <CardBody>
-                    <ListGroup>
-                        <PageSection page={featuredPage} />
-                    </ListGroup>
-                </CardBody>
-            </Card>
-        );
-
-        const otherSection = (
-            <Card className={classes.fullHeight}>
-                <CardHeader className={classes.header}>
-                    Recent Pages
-                </CardHeader>
-                <CardBody className={classes.scrollBody}>
-                    <ListGroup>
-                        {_.map(recentPages, (page, index) => (
-                            <PageSection
-                                key={_.get(page, 'data.title', index)}
-                                page={page}
-                            />
-                        ))}
-                    </ListGroup>
-                </CardBody>
-            </Card>
-        );
-
-        if (isMobile) {
-            return (
-                <Row>
-                    <Col>
-                        <Row>
-                            <Col>
-                                {profileSection}
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                {featuredSection}
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                {addressSection}
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                {otherSection}
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-            );
-        }
-
         return (
-            <React.Fragment>
-                <Row className={classes.fullHeight}>
-                    <Col sm={8} className={`${classes.fullHeight} ${classes.flexColumn}`}>
-                        <Row>
-                            <Col>
-                                {profileSection}
-                            </Col>
-                        </Row>
-                        <Row className={classes.flexFill}>
-                            <Col>
-                                {addressSection}
-                            </Col>
-                        </Row>
-                    </Col>
-                    <Col sm={4} className={`${classes.fullHeight} ${classes.flexColumn}`}>
-                        <Row>
-                            <Col>
-                                {featuredSection}
-                            </Col>
-                        </Row>
-                        <Row className={classes.flexFill}>
-                            <Col className={classes.fullHeight}>
-                                {otherSection}
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-            </React.Fragment>
+            <Row>
+                <Col>
+                    <Row>
+                        <Col>
+                            {profileSection}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            {addressSection}
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
         );
     }
 }
@@ -234,8 +158,6 @@ class EditProfilePage extends React.PureComponent {
 EditProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
     profile: PropTypes.object.isRequired,
-    featuredPage: PropTypes.object.isRequired,
-    recentPages: PropTypes.array.isRequired,
     isMobile: PropTypes.bool.isRequired,
     error: PropTypes.object
 };

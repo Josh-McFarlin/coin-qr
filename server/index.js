@@ -128,8 +128,6 @@ nextApp.prepare().then(() => {
         const optional = _.get(req, 'params.optional');
         const userId = res.locals.userId;
 
-        // console.log('req', req)
-
         if (optional === 'edit' && _.isNil(userId)) {
             res.redirect(urls.auth());
             return;
@@ -153,40 +151,17 @@ nextApp.prepare().then(() => {
         cont();
     });
 
-    server.get('/profile/:profileId/:optional*?', async (req, res, cont) => {
+    server.get('/profile/:profileId', async (req, res, cont) => {
         const profileId = _.get(req, 'params.profileId');
-        const optional = _.get(req, 'params.optional');
-        const userId = res.locals.userId;
-
-        if (optional === 'edit' && _.isNil(userId)) {
-            res.redirect(urls.auth());
-            return;
-        }
 
         await firebaseActions.profiles.fetchProfile(profileId)
             .then(async (profile) => {
-                if (optional === 'edit' && profile.userId !== userId) {
-                    res.redirect(urls.profile.view(profileId));
-                }
-
                 res.locals.profile = profile;
 
                 await firebaseActions.pages.fetchRecent(profile.userId)
                     .then((recentPages) => {
                         res.locals.recentPages = recentPages;
                     });
-
-                const featured = _.defaultTo(
-                    _.get(profile, 'data.featuredPage'),
-                    _.get(res, 'locals.recentPages[0].owner')
-                );
-
-                if (_.isString(featured) && !_.isEmpty(featured)) {
-                    await firebaseActions.pages.fetchPage(featured)
-                        .then((featuredPage) => {
-                            res.locals.featuredPage = featuredPage;
-                        });
-                }
             })
             .catch((error) => {
                 res.locals.error = {
@@ -198,7 +173,7 @@ nextApp.prepare().then(() => {
         cont();
     });
 
-    server.get('/myprofile', async (req, res, cont) => {
+    server.get('/myprofile/edit', async (req, res, cont) => {
         const sessionCookie = _.get(req, 'cookies.session', '');
 
         if (_.isString(sessionCookie) && !_.isEmpty(sessionCookie)) {
@@ -206,12 +181,19 @@ nextApp.prepare().then(() => {
             // if the user's Firebase session was revoked, user deleted/disabled, etc.
             await admin.auth()
                 .verifySessionCookie(sessionCookie, true /** checkRevoked */)
-                .then((decodedClaims) => {
-                    res.redirect(
-                        urls.profile.view(
-                            hashUtil.hashUID(decodedClaims.uid)
-                        )
-                    );
+                .then(async (decodedClaims) => {
+                    const profileId = hashUtil.hashUID(decodedClaims.uid);
+
+                    await firebaseActions.profiles.fetchProfile(profileId)
+                        .then(async (profile) => {
+                            res.locals.profile = profile;
+                        })
+                        .catch((error) => {
+                            res.locals.error = {
+                                message: 'Profile Page Not Found',
+                                statusCode: 404
+                            };
+                        });
                 })
                 .catch(() => {
                     res.redirect(urls.auth());

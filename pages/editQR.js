@@ -12,7 +12,7 @@ import classNames from 'classnames';
 import Error from './_error';
 import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
 import DeleteDialog from '../frontend/components/AddressList/DeleteDialog';
-import { fetchPage, addPage, updatePage, deletePage } from '../frontend/firebase/actions';
+import { addPage, updatePage, deletePage } from '../frontend/firebase/actions';
 import urls from '../utils/urls';
 
 

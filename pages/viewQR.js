@@ -2,15 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
 import _ from 'lodash';
-import {
-    Card, CardHeader, Row, Col, Button, ButtonGroup
-} from 'shards-react';
+import { Card, CardHeader, CardBody, Row, Col, Button, ButtonGroup } from 'shards-react';
 
 import AddressQRCode from '../frontend/components/AddressList/QRCode';
 import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
 import Error from './_error';
 import urls from '../utils/urls';
-import LoadingCardBody from '../frontend/components/LoadingElements/LoadingCardBody';
 
 
 const styles = (theme) => ({
@@ -85,11 +82,10 @@ class ViewPage extends React.PureComponent {
             );
         }
 
-        const thisUrl = `https://coinqr.io${urls.qr.view(page.postId)}`;
+        const thisUrl = `${urls.base}${urls.qr.view(page.postId)}`;
 
         const isOwner =
             _.has(page, 'owner')
-            && _.has(page, 'owner')
             && _.isString(userId)
             && page.owner === userId;
 
@@ -102,7 +98,7 @@ class ViewPage extends React.PureComponent {
                                 <CardHeader className={classes.header}>
                                     {_.get(page, 'data.title')}
                                 </CardHeader>
-                                <LoadingCardBody isLoading={_.isNil(page) || _.isNil(userId)}>
+                                <CardBody>
                                     {(_.has(page, 'data.caption') && page.data.caption.length > 0) && (
                                         <p>
                                             {_.get(page, 'data.caption')}
@@ -125,7 +121,7 @@ class ViewPage extends React.PureComponent {
                                             View QR
                                         </Button>
                                     </ButtonGroup>
-                                </LoadingCardBody>
+                                </CardBody>
                             </Card>
                         </Col>
                     </Row>

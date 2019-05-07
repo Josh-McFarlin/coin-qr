@@ -58,10 +58,6 @@ const TermsModal = ({ classes, isOpen, toggleModal }) => (
                     CryptoQR and its owner make no guarantee the tool (and mostly cryptocurrency in general) is legal in your jurisdiction.
                     Those who choose to access this tool from other locations do so on their own initiative and are responsible for compliance with applicable local laws.
                 </li>
-                <li>
-                    In summary, by using this tool you acknowledge you are solely responsible for abiding all applicable regulations in your area,
-                    and CryptoQR and its owner is not responsible for any funds or problems that arise.
-                </li>
             </ul>
         </ModalBody>
         <ModalFooter>

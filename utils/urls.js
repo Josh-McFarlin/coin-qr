@@ -1,4 +1,5 @@
 module.exports = {
+    base: 'https://coinqr.io',
     home: () => '/',
     auth: () => '/login',
     recent: () => '/recent',
@@ -8,7 +9,6 @@ module.exports = {
         edit: (id) => `/qr/${id}/edit`
     },
     myProfile: {
-        view: () => '/myprofile',
         edit: () => '/myprofile/edit'
     },
     profile: {

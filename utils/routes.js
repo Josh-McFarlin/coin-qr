@@ -9,4 +9,4 @@ module.exports = routes()
     .add('viewQR', '/qr/:id')
     .add('editQR', '/qr/:id/edit')
     .add('viewProfile', '/profile/:id?')
-    .add('editProfile', '/profile/:id/edit');
+    .add('editProfile', '/myprofile/edit');

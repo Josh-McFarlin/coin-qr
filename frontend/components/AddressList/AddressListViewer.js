@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
-import { Card, CardHeader, ListGroup } from 'shards-react';
+import { Card, CardHeader, CardBody, ListGroup } from 'shards-react';
 import _ from 'lodash';
 
 import AddressRow from './AddressRow';
 import AddressQRCode from './QRCode';
-import LoadingCardBody from '../LoadingElements/LoadingCardBody';
 
 
 const styles = (theme) => ({
@@ -63,10 +62,7 @@ class AddressListViewer extends React.PureComponent {
                     <CardHeader className={classes.header}>
                         Address List
                     </CardHeader>
-                    <LoadingCardBody
-                        className={classes.body}
-                        isLoading={_.isNil(addresses)}
-                    >
+                    <CardBody className={classes.body}>
                         <ListGroup>
                             {_.map(addresses, (item) => (
                                 <div
@@ -81,7 +77,7 @@ class AddressListViewer extends React.PureComponent {
                                 </div>
                             ))}
                         </ListGroup>
-                    </LoadingCardBody>
+                    </CardBody>
                 </Card>
                 <AddressQRCode
                     modalOpen={modalOpen}

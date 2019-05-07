@@ -9,6 +9,7 @@ import _ from 'lodash';
 
 import TermsModal from '../Terms/TermsModal';
 import urls from '../../../utils/urls';
+import hashUtils from '../../../utils/hash';
 import { signOut } from '../../firebase/actions';
 
 
@@ -84,8 +85,8 @@ class NavBar extends React.PureComponent {
                             {_.isString(userId) && (
                                 <NavItem className={classes.navItem}>
                                     <NavLink
-                                        active={router.asPath === urls.myProfile.view()}
-                                        href={urls.myProfile.view()}
+                                        active={router.asPath === urls.profile.view(hashUtils.hashUID(userId))}
+                                        href={urls.profile.view(hashUtils.hashUID(userId))}
                                     >
                                         Profile
                                     </NavLink>
