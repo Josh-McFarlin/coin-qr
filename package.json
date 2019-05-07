@@ -1,6 +1,6 @@
 {
   "name": "crypto-qr",
-  "description": "Generate a single QR code to receive payments in multiple cryptocurrencies",
+  "description": "A tool to generate a single QR code to receive payments in multiple cryptocurrencies",
   "version": "0.1.0",
   "author": "Josh McFarlin",
   "license": "MIT",
@@ -52,12 +52,13 @@
     "dev": "node server",
     "build": "next build",
     "now-build": "next build",
-    "dev-prod": "NODE_ENV=production npm run build && node server",
-    "start": "NODE_ENV=production node server",
+    "dev-prod": "cross-env NODE_ENV=production npm run build && node server",
+    "start": "cross-env NODE_ENV=production node server",
     "export": "npm run build && next export"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
+    "cross-env": "^5.2.0",
     "eslint": "^5.15.3",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.16.0",
