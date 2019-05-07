@@ -77,8 +77,6 @@ class EditProfilePage extends React.PureComponent {
     render() {
         const { classes, error, profile, featuredPage, recentPages, isMobile } = this.props;
 
-        // console.log('props', this.props)
-
         if (_.isObject(error)) {
             return (
                 <Error
@@ -238,6 +236,7 @@ EditProfilePage.propTypes = {
     profile: PropTypes.object.isRequired,
     featuredPage: PropTypes.object.isRequired,
     recentPages: PropTypes.array.isRequired,
+    isMobile: PropTypes.bool.isRequired,
     error: PropTypes.object
 };
 

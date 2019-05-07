@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
-import { withRouter } from 'next/router';
 import _ from 'lodash';
 import {
     Card, CardHeader, Row, Col, Button, ButtonGroup
@@ -11,7 +10,6 @@ import AddressQRCode from '../frontend/components/AddressList/QRCode';
 import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
 import Error from './_error';
 import urls from '../utils/urls';
-import { fetchPage } from '../frontend/firebase/actions';
 import LoadingCardBody from '../frontend/components/LoadingElements/LoadingCardBody';
 
 
@@ -51,12 +49,12 @@ const styles = (theme) => ({
 
 class ViewPage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
-        const postId = _.get(query, 'id');
         const locals = _.get(res, 'locals', {});
 
         return {
-            postId,
-            userId: locals.userId
+            page: locals.page,
+            userId: locals.userId,
+            error: locals.error
         };
     }
 
@@ -64,28 +62,8 @@ class ViewPage extends React.PureComponent {
         super(props);
 
         this.state = {
-            modalOpen: false,
-            page: null
+            modalOpen: false
         };
-    }
-
-    componentDidMount() {
-        const { postId } = this.props;
-
-        fetchPage(postId)
-            .then((page) => {
-                this.setState({
-                    page
-                });
-            })
-            .catch(() => {
-                this.setState({
-                    error: {
-                        statusCode: 404,
-                        statusMessage: 'QR Page Not Found :('
-                    }
-                });
-            });
     }
 
     toggleModal = () => {
@@ -95,8 +73,8 @@ class ViewPage extends React.PureComponent {
     };
 
     render() {
-        const { classes, postId, userId, isMobile } = this.props;
-        const { error, modalOpen, page } = this.state;
+        const { classes, userId, isMobile, page, error } = this.props;
+        const { modalOpen } = this.state;
 
         if (_.has(error, 'statusCode')) {
             return (
@@ -107,7 +85,7 @@ class ViewPage extends React.PureComponent {
             );
         }
 
-        const thisUrl = `https://coinqr.io${urls.qr.view(postId)}`;
+        const thisUrl = `https://coinqr.io${urls.qr.view(page.postId)}`;
 
         const isOwner =
             _.has(page, 'owner')
@@ -134,7 +112,7 @@ class ViewPage extends React.PureComponent {
                                         {isOwner && (
                                             <Button
                                                 theme='primary'
-                                                href={urls.qr.edit(postId)}
+                                                href={urls.qr.edit(page.postId)}
                                             >
                                                 Edit Page
                                             </Button>
@@ -144,7 +122,7 @@ class ViewPage extends React.PureComponent {
                                             theme='primary'
                                             onClick={this.toggleModal}
                                         >
-                                                View QR
+                                            View QR
                                         </Button>
                                     </ButtonGroup>
                                 </LoadingCardBody>
@@ -176,13 +154,15 @@ class ViewPage extends React.PureComponent {
 
 ViewPage.propTypes = {
     classes: PropTypes.object.isRequired,
-    postId: PropTypes.string.isRequired,
+    page: PropTypes.object.isRequired,
     isMobile: PropTypes.bool.isRequired,
-    userId: PropTypes.string
+    userId: PropTypes.string,
+    error: PropTypes.object
 };
 
 ViewPage.defaultProps = {
-    userId: null
+    userId: null,
+    error: null
 };
 
-export default withRouter(withStyles(styles)(ViewPage));
+export default withStyles(styles)(ViewPage);

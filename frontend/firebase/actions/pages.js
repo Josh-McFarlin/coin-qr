@@ -37,11 +37,7 @@ export const addPage = (data, owner) => {
         .collection('pages')
         .doc();
 
-    console.log('docRef', docRef);
-
     page.postId = hashUtils.hashUID(docRef.id);
-
-    console.log('page', page)
 
     return docRef
         .set(page)

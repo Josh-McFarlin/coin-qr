@@ -5,8 +5,7 @@ import _ from 'lodash';
 import { Card, CardHeader, CardBody, Col, ListGroup, Row } from 'shards-react';
 
 import Error from './_error';
-import AddressListViewer
-    from '../frontend/components/AddressList/AddressListViewer';
+import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
 import PageSection from '../frontend/components/PageSection/PageSection';
 import noProfilePic from '../static/images/noProfilePic.png';
 

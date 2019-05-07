@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 const next = require('next');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -113,7 +114,7 @@ nextApp.prepare().then(() => {
         res.redirect(urls.home());
     });
 
-    server.get(urls.recent(), async (req, res, cont) => {
+    server.get('/recent', async (req, res, cont) => {
         await firebaseActions.pages.fetchRecent()
             .then((pages) => {
                 res.locals.recentPages = pages;
@@ -122,11 +123,52 @@ nextApp.prepare().then(() => {
         cont();
     });
 
+    server.get('/qr/:postId/:optional*?', async (req, res, cont) => {
+        const postId = _.get(req, 'params.postId');
+        const optional = _.get(req, 'params.optional');
+        const userId = res.locals.userId;
+
+        // console.log('req', req)
+
+        if (optional === 'edit' && _.isNil(userId)) {
+            res.redirect(urls.auth());
+            return;
+        }
+
+        await firebaseActions.pages.fetchPage(postId)
+            .then((page) => {
+                if (optional === 'edit' && page.owner !== userId) {
+                    res.redirect(urls.qr.view(postId));
+                }
+
+                res.locals.page = page;
+            })
+            .catch(() => {
+                res.locals.error = {
+                    statusCode: 404,
+                    statusMessage: 'QR Page Not Found :('
+                };
+            });
+
+        cont();
+    });
+
     server.get('/profile/:profileId/:optional*?', async (req, res, cont) => {
         const profileId = _.get(req, 'params.profileId');
+        const optional = _.get(req, 'params.optional');
+        const userId = res.locals.userId;
+
+        if (optional === 'edit' && _.isNil(userId)) {
+            res.redirect(urls.auth());
+            return;
+        }
 
         await firebaseActions.profiles.fetchProfile(profileId)
             .then(async (profile) => {
+                if (optional === 'edit' && profile.userId !== userId) {
+                    res.redirect(urls.profile.view(profileId));
+                }
+
                 res.locals.profile = profile;
 
                 await firebaseActions.pages.fetchRecent(profile.userId)

@@ -40,51 +40,33 @@ const styles = () => ({
 });
 
 class EditPage extends React.PureComponent {
-    static async getInitialProps({ query, req, res }) {
+    static async getInitialProps({ query, res }) {
         const locals = _.get(res, 'locals', {});
-        const postId = _.get(query, 'id');
 
         return {
-            postId,
-            newPage: _.isNil(postId) || _.isEmpty(postId),
-            userId: locals.userId
+            page: locals.page,
+            isNewPage: locals.page == null,
+            userId: locals.userId,
+            error: locals.error
         };
     }
 
     constructor(props) {
         super(props);
 
+        const page = _.get(props, 'page', null);
+        const data = _.get(page, 'data', {
+            title: '',
+            caption: '',
+            addresses: []
+        });
+
         this.state = {
-            page: null,
-            data: {
-                title: '',
-                caption: '',
-                addresses: []
-            },
-            showDelete: false
+            page,
+            data,
+            showDelete: false,
+            editError: null
         };
-    }
-
-    componentDidMount() {
-        const { postId } = this.props;
-
-        if (_.isString(postId) && !_.isEmpty(postId)) {
-            fetchPage(postId)
-                .then((page) => {
-                    this.setState({
-                        page,
-                        data: page.data
-                    });
-                })
-                .catch(() => {
-                    this.setState({
-                        goToError: {
-                            code: 404,
-                            message: 'QR Page Not Found'
-                        }
-                    });
-                });
-        }
     }
 
     handleChange = ({ target: { id, value } }) => {
@@ -102,45 +84,45 @@ class EditPage extends React.PureComponent {
 
         this.setState((prevState) => ({
             data: _.set(dataCopy, 'addresses', addresses),
-            error: _.get(prevState, 'error.type') === 'addresses' && addresses.length > 0 ? null : prevState.error
+            editError: _.get(prevState, 'editError.type') === 'addresses' && addresses.length > 0 ? null : prevState.editError
         }));
     };
 
     submitJson = () => {
-        const { postId, router, userId, newPage } = this.props;
-        const { page, data } = this.state;
+        const { router, userId, isNewPage, page } = this.props;
+        const { data } = this.state;
 
         if (_.isNil(data.title) || data.title.length === 0) {
             this.setState({
-                error: {
+                editError: {
                     type: 'title',
                     message: 'Please provide a title!'
                 }
             });
         } else if (data.addresses.length === 0) {
             this.setState({
-                error: {
+                editError: {
                     type: 'addresses',
                     message: 'Error: Please add at least one address!'
                 }
             });
         } else if (data.addresses.length > 15) {
             this.setState({
-                error: {
+                editError: {
                     type: 'addresses',
                     message: `Error: A page can contain a maximum of 15 addresses, please remove at least ${data.addresses.length - 15} addresses!`
                 }
             });
-        } else if (newPage) {
+        } else if (isNewPage) {
             console.log('userId', userId)
 
             addPage(data, userId)
                 .then((created) => router.push(urls.qr.view(created.postId)));
         } else if (!_.isEqual(data, page.data)) {
-            updatePage(data, postId)
-                .then(() => router.push(urls.qr.view(postId)));
+            updatePage(data, page.postId)
+                .then(() => router.push(urls.qr.view(page.postId)));
         } else {
-            router.push(urls.qr.view(postId));
+            router.push(urls.qr.view(page.postId));
         }
     };
 
@@ -151,21 +133,21 @@ class EditPage extends React.PureComponent {
     };
 
     handleDelete = () => {
-        const { postId, router } = this.props;
+        const { page, router } = this.props;
 
-        deletePage(postId)
+        deletePage(page.postId)
             .then(() => router.push(urls.home()));
     };
 
     render() {
-        const { classes, newPage, isMobile } = this.props;
-        const { data, error, showDelete, goToError } = this.state;
+        const { classes, isNewPage, isMobile, error } = this.props;
+        const { data, editError, showDelete } = this.state;
 
-        if (_.isObject(goToError)) {
+        if (_.isObject(error)) {
             return (
                 <Error
-                    statusCode={goToError.code}
-                    statusMessage={goToError.message}
+                    statusCode={error.code}
+                    statusMessage={error.message}
                 />
             );
         }
@@ -177,7 +159,7 @@ class EditPage extends React.PureComponent {
                         <Col>
                             <Card>
                                 <CardHeader className={classes.header}>
-                                    {newPage ? 'New QR Page' : 'Editing QR Page'}
+                                    {isNewPage ? 'New QR Page' : 'Editing QR Page'}
                                 </CardHeader>
                                 <CardBody>
                                     <Form>
@@ -187,7 +169,7 @@ class EditPage extends React.PureComponent {
                                                 id='title'
                                                 onChange={this.handleChange}
                                                 value={data.title}
-                                                invalid={_.get(error, 'type') === 'title' || data.title.length > 50}
+                                                invalid={_.get(editError, 'type') === 'title' || data.title.length > 50}
                                             />
                                             <FormFeedback>
                                                 Please provide a title no longer than 50 characters in length.
@@ -216,7 +198,7 @@ class EditPage extends React.PureComponent {
                             <AddressListEditor
                                 className={classes.fullHeight}
                                 addresses={data.addresses}
-                                error={error}
+                                error={editError}
                                 updateAddresses={this.updateAddresses}
                             />
 
@@ -258,16 +240,19 @@ class EditPage extends React.PureComponent {
 
 EditPage.propTypes = {
     classes: PropTypes.object.isRequired,
-    postId: PropTypes.string.isRequired,
     router: PropTypes.object.isRequired,
     isMobile: PropTypes.bool.isRequired,
     userId: PropTypes.string,
-    newPage: PropTypes.bool
+    isNewPage: PropTypes.bool,
+    error: PropTypes.object,
+    page: PropTypes.object
 };
 
 EditPage.defaultProps = {
     userId: null,
-    newPage: true
+    isNewPage: true,
+    error: null,
+    page: null
 };
 
 export default withRouter(withStyles(styles)(EditPage));
