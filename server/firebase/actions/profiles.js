@@ -1,7 +1,7 @@
-const Hashids = require('hashids');
 const _ = require('lodash');
 
 const firebase = require('../index');
+const hashUtils = require('../../../utils/hash');
 
 
 module.exports.fetchProfile = (id) =>
@@ -21,43 +21,27 @@ module.exports.fetchProfile = (id) =>
                     data.modified = data.modified.toDate();
                 }
 
-                data.id = profile.id;
-
                 return data;
             }
 
             throw Error('Profile not found');
         });
 
-module.exports.createProfile = (user) => {
+module.exports.createProfile = (userId) => {
     const date = new Date();
 
-    const hashids = new Hashids(user.uid, 5);
-    const profileId = hashids.encode(1);
+    const profileId = hashUtils.hashUID(userId);
 
     const profile = {
         created: firebase.firestore.Timestamp.fromDate(date),
         modified: firebase.firestore.Timestamp.fromDate(date),
-        userId: user.uid,
+        userId,
+        profileId,
         data: {
-            profileId,
+            addresses: [],
             bio: '',
-            email: {
-                email: user.email,
-                public: false
-            },
-            featuredPage: {
-                featuredPage: '',
-                public: false
-            },
-            name: {
-                name: '',
-                public: false
-            },
-            picture: {
-                picture: '',
-                public: false
-            }
+            name: '',
+            picture: ''
         }
     };
 
@@ -68,17 +52,15 @@ module.exports.createProfile = (user) => {
         .then(() => profile);
 };
 
-module.exports.updateProfile = (data, id) => {
+module.exports.updateProfile = (profile) => {
+    const profileClone = _.cloneDeep(profile);
     const date = new Date();
 
-    const profile = {
-        modified: firebase.firestore.Timestamp.fromDate(date),
-        data
-    };
+    profileClone.modified = firebase.firestore.Timestamp.fromDate(date);
 
     return firebase.firestore()
         .collection('profiles')
-        .doc(id)
-        .update(profile)
-        .then(() => profile);
+        .doc(profileClone.profileId)
+        .update(profileClone)
+        .then(() => profileClone);
 };

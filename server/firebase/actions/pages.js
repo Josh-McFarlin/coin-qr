@@ -37,36 +37,30 @@ module.exports.addPage = (data, owner) => {
         .collection('pages')
         .doc();
 
-    console.log('docRef', docRef);
-
     page.postId = hashUtils.hashUID(docRef.id);
-
-    console.log('page', page);
 
     return docRef
         .set(page)
         .then(() => page);
 };
 
-module.exports.updatePage = (data, id) => {
+module.exports.updatePage = (page) => {
+    const pageClone = _.cloneDeep(page);
     const date = new Date();
 
-    const page = {
-        modified: firebase.firestore.Timestamp.fromDate(date),
-        data
-    };
+    pageClone.modified = firebase.firestore.Timestamp.fromDate(date);
 
     return firebase.firestore()
         .collection('pages')
-        .doc(id)
-        .update(page)
-        .then(() => page);
+        .doc(pageClone.postId)
+        .update(pageClone)
+        .then(() => pageClone);
 };
 
-module.exports.deletePage = (id) =>
+module.exports.deletePage = (postId) =>
     firebase.firestore()
         .collection('pages')
-        .doc(id)
+        .doc(postId)
         .delete();
 
 module.exports.fetchRecent = (userId) => {
