@@ -113,10 +113,10 @@ class EditPage extends React.PureComponent {
                 }
             });
         } else if (isNewPage) {
-            console.log('userId', userId)
-
             addPage(data, userId)
-                .then((created) => router.push(urls.qr.view(created.postId)));
+                .then((createdPage) => {
+                    router.push(urls.qr.view(createdPage.postId));
+                });
         } else if (!_.isEqual(data, page.data)) {
             updatePage(data, page.postId)
                 .then(() => router.push(urls.qr.view(page.postId)));
@@ -190,17 +190,19 @@ class EditPage extends React.PureComponent {
                                 </CardBody>
                                 <CardFooter>
                                     <div className={classes.actionButtons}>
-                                        <Button
-                                            theme='danger'
-                                            onClick={this.toggleDelete}
-                                        >
-                                            Delete Page
-                                        </Button>
+                                        {!isNewPage && (
+                                            <Button
+                                                theme='danger'
+                                                onClick={this.toggleDelete}
+                                            >
+                                                Delete Page
+                                            </Button>
+                                        )}
                                         <Button
                                             theme='success'
                                             onClick={this.submitJson}
                                         >
-                                            Save Page
+                                            {isNewPage ? 'Created Page' : 'Save Page'}
                                         </Button>
                                     </div>
                                 </CardFooter>

@@ -3,65 +3,14 @@ const _ = require('lodash');
 const firebase = require('../index');
 const hashUtils = require('../../../utils/hash');
 
-
-module.exports.fetchPage = (id) =>
+// ~~~~~ Fetch ~~~~~
+module.exports.fetchPage = (postId) =>
     firebase.firestore()
         .collection('pages')
-        .doc(id)
+        .where('postId', '==', postId)
+        .limit(1)
         .get()
-        .then((page) => {
-            if (page.exists) {
-                return {
-                    ...page.data(),
-                    id
-                };
-            }
-
-            throw Error('Page does not exist!');
-        });
-
-module.exports.addPage = (data, owner) => {
-    const date = new Date();
-
-    const page = {
-        created: firebase.firestore.Timestamp.fromDate(date),
-        modified: firebase.firestore.Timestamp.fromDate(date),
-        data
-    };
-
-    if (_.isString(owner)) {
-        page.owner = owner;
-    }
-
-    const docRef = firebase.firestore()
-        .collection('pages')
-        .doc();
-
-    page.postId = hashUtils.hashUID(docRef.id);
-
-    return docRef
-        .set(page)
-        .then(() => page);
-};
-
-module.exports.updatePage = (page) => {
-    const pageClone = _.cloneDeep(page);
-    const date = new Date();
-
-    pageClone.modified = firebase.firestore.Timestamp.fromDate(date);
-
-    return firebase.firestore()
-        .collection('pages')
-        .doc(pageClone.postId)
-        .update(pageClone)
-        .then(() => pageClone);
-};
-
-module.exports.deletePage = (postId) =>
-    firebase.firestore()
-        .collection('pages')
-        .doc(postId)
-        .delete();
+        .then((querySnapshot) => querySnapshot.docs[0].data());
 
 module.exports.fetchRecent = (userId) => {
     let pages = firebase.firestore().collection('pages');
@@ -92,3 +41,44 @@ module.exports.fetchRecent = (userId) => {
             return recentPages;
         });
 };
+// ~~~~~~~~~~~~~~~
+
+
+// ~~~~~ Set ~~~~~
+module.exports.addPage = (page) => {
+    const pageClone = _.cloneDeep(page);
+
+    const date = new Date();
+    pageClone.created = firebase.firestore.Timestamp.fromDate(date);
+    pageClone.modified = firebase.firestore.Timestamp.fromDate(date);
+
+    const docRef = firebase.firestore()
+        .collection('pages')
+        .doc();
+
+    pageClone.postId = hashUtils.hashUID(docRef.id);
+
+    return docRef
+        .set(pageClone)
+        .then(() => pageClone);
+};
+
+module.exports.updatePage = (page) => {
+    const pageClone = _.cloneDeep(page);
+    const date = new Date();
+
+    pageClone.modified = firebase.firestore.Timestamp.fromDate(date);
+
+    return firebase.firestore()
+        .collection('pages')
+        .doc(pageClone.postId)
+        .update(pageClone)
+        .then(() => pageClone);
+};
+
+module.exports.deletePage = (postId) =>
+    firebase.firestore()
+        .collection('pages')
+        .doc(postId)
+        .delete();
+// ~~~~~~~~~~~~~~~

@@ -4,6 +4,7 @@ const firebase = require('../index');
 const hashUtils = require('../../../utils/hash');
 
 
+// ~~~~~ Fetch ~~~~~
 module.exports.fetchProfile = (id) =>
     firebase.firestore()
         .collection('profiles')
@@ -26,7 +27,10 @@ module.exports.fetchProfile = (id) =>
 
             throw Error('Profile not found');
         });
+// ~~~~~~~~~~~~~~~
 
+
+// ~~~~~ Set ~~~~~
 module.exports.createProfile = (userId) => {
     const date = new Date();
 
@@ -64,3 +68,4 @@ module.exports.updateProfile = (profile) => {
         .update(profileClone)
         .then(() => profileClone);
 };
+// ~~~~~~~~~~~~~~~
