@@ -1,16 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
+import { withRouter } from 'next/router';
 import _ from 'lodash';
 import {
-    Card, CardHeader, CardBody, Row, Col, ListGroup,
-    Form, FormGroup, FormInput, FormTextarea, FormFeedback
+    Card, CardHeader, CardBody, CardFooter, Row, Col,
+    Form, FormGroup, FormInput, FormTextarea, Button
 } from 'shards-react';
 
 import Error from './_error';
 import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
-import PageSection from '../frontend/components/PageSection/PageSection';
 import noProfilePic from '../static/images/noProfilePic.png';
+import { updateProfile } from '../frontend/firebase/actions';
+import urls from '../utils/urls';
 
 
 const styles = () => ({
@@ -59,6 +61,9 @@ const styles = () => ({
     },
     noMarginBottom: {
         marginBottom: 0
+    },
+    floatRight: {
+        float: 'right'
     }
 });
 
@@ -72,8 +77,59 @@ class EditProfilePage extends React.PureComponent {
         };
     }
 
+    constructor(props) {
+        super(props);
+
+        const profile = _.get(props, 'profile', null);
+        const data = _.get(profile, 'data', {});
+
+        this.state = {
+            data,
+            editError: null
+        };
+    }
+
+    handleChange = ({ target: { id, value } }) => {
+        const { data } = this.state;
+        const dataCopy = _.cloneDeep(data);
+
+        this.setState({
+            data: _.set(dataCopy, id, value)
+        });
+    };
+
+    updateAddresses = (addresses) => {
+        const { data } = this.state;
+        const dataCopy = _.cloneDeep(data);
+
+        this.setState((prevState) => ({
+            data: _.set(dataCopy, 'addresses', addresses),
+            editError: _.get(prevState, 'editError.type') === 'addresses' && addresses.length > 0 ? null : prevState.editError
+        }));
+    };
+
+    submitJson = () => {
+        const { router, profile } = this.props;
+        const { data } = this.state;
+
+        if (data.addresses.length > 10) {
+            this.setState({
+                editError: {
+                    type: 'addresses',
+                    message: `Error: A profile can contain a maximum of 10 addresses, please remove at least ${data.addresses.length - 10} addresses!`
+                }
+            });
+        } else if (!_.isEqual(data, profile.data)) {
+            updateProfile(data, profile.profileId)
+                .then(() => router.push(urls.profile.view(profile.profileId)));
+        } else {
+            router.push(urls.profile.view(profile.profileId));
+        }
+    };
+
     render() {
-        const { classes, error, profile, isMobile } = this.props;
+        const { classes, error } = this.props;
+        const { data, editError } = this.state;
 
         if (_.isObject(error)) {
             return (
@@ -92,47 +148,64 @@ class EditProfilePage extends React.PureComponent {
                 <CardBody>
                     <Row className={classes.rowNoPadding}>
                         <Col sm={2}>
-                            <Row>
-                                <Col className={classes.profileName}>
-                                    <FormGroup className={classes.noMarginBottom}>
-                                        <label htmlFor='title'>Name</label>
-                                        <FormInput
-                                            id='name'
-                                            // onChange={this.handleChange}
-                                            value={_.get(profile, 'data.name')}
-                                        />
-                                    </FormGroup>
-                                </Col>
-                            </Row>
-                            <Row className={classes.rowNoPadding}>
+                            <Row className={classes.fullHeight}>
                                 <Col className={classes.profileCol}>
                                     <img
                                         className={classes.profilePicture}
-                                        src={_.get(profile, 'data.picture', noProfilePic)}
+                                        src={_.get(data, 'picture', noProfilePic)}
                                         alt='Profile'
                                     />
                                 </Col>
                             </Row>
                         </Col>
                         <Col sm={10}>
-                            <FormGroup>
-                                <label htmlFor='caption'>Bio</label>
-                                <FormTextarea
-                                    id='bio'
-                                    // onChange={this.handleChange}
-                                    value={_.get(profile, 'data.bio', '')}
-                                />
-                            </FormGroup>
+                            <Form>
+                                <FormGroup>
+                                    <label htmlFor='name'>Name</label>
+                                    <FormInput
+                                        id='name'
+                                        onChange={this.handleChange}
+                                        value={_.get(data, 'name', '')}
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <label htmlFor='picture'>Profile Picture URL</label>
+                                    <FormInput
+                                        id='picture'
+                                        onChange={this.handleChange}
+                                        value={_.get(data, 'picture', '')}
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <label htmlFor='bio'>Bio</label>
+                                    <FormTextarea
+                                        id='bio'
+                                        onChange={this.handleChange}
+                                        value={_.get(data, 'bio', '')}
+                                    />
+                                </FormGroup>
+                            </Form>
                         </Col>
                     </Row>
                 </CardBody>
+                <CardFooter>
+                    <Button
+                        theme='success'
+                        onClick={this.submitJson}
+                        className={classes.floatRight}
+                    >
+                        Save Page
+                    </Button>
+                </CardFooter>
             </Card>
         );
 
         const addressSection = (
             <AddressListEditor
                 className={classes.fullHeight}
-                addresses={_.get(profile, 'data.addresses', [])}
+                addresses={_.get(data, 'addresses', [])}
+                error={editError}
+                updateAddresses={this.updateAddresses}
             />
         );
 
@@ -158,7 +231,7 @@ class EditProfilePage extends React.PureComponent {
 EditProfilePage.propTypes = {
     classes: PropTypes.object.isRequired,
     profile: PropTypes.object.isRequired,
-    isMobile: PropTypes.bool.isRequired,
+    router: PropTypes.object.isRequired,
     error: PropTypes.object
 };
 
@@ -166,4 +239,4 @@ EditProfilePage.defaultProps = {
     error: undefined
 };
 
-export default withStyles(styles)(EditProfilePage);
+export default withRouter(withStyles(styles)(EditProfilePage));

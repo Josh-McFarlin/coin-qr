@@ -133,7 +133,10 @@ class AddressListEditor extends React.PureComponent {
                 <Card className={className}>
                     <CardHeader className={classes.header}>
                         Address List
-                        <Button onClick={this.toggleModal}>
+                        <Button
+                            theme='info'
+                            onClick={this.toggleModal}
+                        >
                             Add New Address
                         </Button>
                     </CardHeader>
@@ -232,7 +235,7 @@ class AddressListEditor extends React.PureComponent {
                             Cancel
                         </Button>
                         <Button
-                            theme='primary'
+                            theme='success'
                             onClick={this.addAddress}
                         >
                             Add

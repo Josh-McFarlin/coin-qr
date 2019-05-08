@@ -62,7 +62,6 @@ class EditPage extends React.PureComponent {
         });
 
         this.state = {
-            page,
             data,
             showDelete: false,
             editError: null
@@ -189,6 +188,22 @@ class EditPage extends React.PureComponent {
                                         </FormGroup>
                                     </Form>
                                 </CardBody>
+                                <CardFooter>
+                                    <div className={classes.actionButtons}>
+                                        <Button
+                                            theme='danger'
+                                            onClick={this.toggleDelete}
+                                        >
+                                            Delete Page
+                                        </Button>
+                                        <Button
+                                            theme='success'
+                                            onClick={this.submitJson}
+                                        >
+                                            Save Page
+                                        </Button>
+                                    </div>
+                                </CardFooter>
                             </Card>
                         </Col>
                     </Row>
@@ -207,29 +222,6 @@ class EditPage extends React.PureComponent {
                                 toggleModal={this.toggleDelete}
                                 deletePage={this.handleDelete}
                             />
-                        </Col>
-                    </Row>
-
-                    <Row>
-                        <Col>
-                            <Card>
-                                <CardFooter>
-                                    <div className={classes.actionButtons}>
-                                        <Button
-                                            theme='danger'
-                                            onClick={this.toggleDelete}
-                                        >
-                                            Delete
-                                        </Button>
-                                        <Button
-                                            theme='primary'
-                                            onClick={this.submitJson}
-                                        >
-                                            Save Page
-                                        </Button>
-                                    </div>
-                                </CardFooter>
-                            </Card>
                         </Col>
                     </Row>
                 </Col>
