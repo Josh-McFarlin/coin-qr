@@ -21,6 +21,8 @@ const handler = nextRoutes.getRequestHandler(nextApp);
 nextApp.prepare().then(() => {
     const server = express();
 
+    server.enable('trust proxy');
+
     server.use(cors());
     server.use(helmet());
     server.use(bodyParser.json());
