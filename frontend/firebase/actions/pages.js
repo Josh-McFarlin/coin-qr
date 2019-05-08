@@ -1,16 +1,5 @@
-import _ from 'lodash';
-
-
-export const addPage = (data, owner) => {
-    const page = {
-        data
-    };
-
-    if (_.isString(owner)) {
-        page.owner = owner;
-    }
-
-    return fetch('/firebase/addPage', {
+export const addPage = (data) =>
+    fetch('/firebase/addPage', {
         method: 'post',
         mode: 'same-origin',
         credentials: 'include',
@@ -18,16 +7,34 @@ export const addPage = (data, owner) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            page
+            data
         })
     })
         .then((response) => response.json());
-};
 
-export const updatePage = (data, id) => {
-    // TODO: POST page
-};
+export const updatePage = (data, id) =>
+    fetch('/firebase/updatePage', {
+        method: 'post',
+        mode: 'same-origin',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            data,
+            id
+        })
+    });
 
-export const deletePage = (id) => {
-    // TODO: POST page id
-};
+export const deletePage = (id) =>
+    fetch('/firebase/deletePage', {
+        method: 'post',
+        mode: 'same-origin',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id
+        })
+    });

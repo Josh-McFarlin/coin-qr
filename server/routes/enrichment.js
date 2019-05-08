@@ -26,7 +26,7 @@ module.exports = (server) => {
             return;
         }
 
-        await firebaseActions.pages.fetchPage(postId)
+        await firebaseActions.pages.fetchPageByPostId(postId)
             .then((page) => {
                 if (optional === 'edit' && page.owner !== userId) {
                     res.redirect(urls.qr.view(postId));

@@ -36,6 +36,9 @@ const styles = () => ({
     },
     flexFill: {
         flex: 1
+    },
+    floatRight: {
+        float: 'right'
     }
 });
 
@@ -118,8 +121,10 @@ class EditPage extends React.PureComponent {
                     router.push(urls.qr.view(createdPage.postId));
                 });
         } else if (!_.isEqual(data, page.data)) {
-            updatePage(data, page.postId)
-                .then(() => router.push(urls.qr.view(page.postId)));
+            updatePage(data, page.id)
+                .then(() => {
+                    router.push(urls.qr.view(page.postId));
+                });
         } else {
             router.push(urls.qr.view(page.postId));
         }
@@ -134,7 +139,7 @@ class EditPage extends React.PureComponent {
     handleDelete = () => {
         const { page, router } = this.props;
 
-        deletePage(page.postId)
+        deletePage(page.id)
             .then(() => router.push(urls.home()));
     };
 
@@ -189,22 +194,21 @@ class EditPage extends React.PureComponent {
                                     </Form>
                                 </CardBody>
                                 <CardFooter>
-                                    <div className={classes.actionButtons}>
-                                        {!isNewPage && (
-                                            <Button
-                                                theme='danger'
-                                                onClick={this.toggleDelete}
-                                            >
-                                                Delete Page
-                                            </Button>
-                                        )}
+                                    {!isNewPage && (
                                         <Button
-                                            theme='success'
-                                            onClick={this.submitJson}
+                                            theme='danger'
+                                            onClick={this.toggleDelete}
                                         >
-                                            {isNewPage ? 'Created Page' : 'Save Page'}
+                                            Delete Page
                                         </Button>
-                                    </div>
+                                    )}
+                                    <Button
+                                        className={classes.floatRight}
+                                        theme='success'
+                                        onClick={this.submitJson}
+                                    >
+                                        {isNewPage ? 'Create Page' : 'Save Page'}
+                                    </Button>
                                 </CardFooter>
                             </Card>
                         </Col>

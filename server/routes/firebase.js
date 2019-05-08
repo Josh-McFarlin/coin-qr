@@ -1,9 +1,6 @@
 const _ = require('lodash');
 
-const admin = require('../firebase');
 const firebaseActions = require('../firebase/actions');
-const urls = require('../../utils/urls');
-const hashUtil = require('../../utils/hash');
 
 
 module.exports = (server) => {
@@ -18,26 +15,64 @@ module.exports = (server) => {
     }
 
     server.post('/firebase/addPage', isLocal, async (req, res) => {
-        const currentUserId = _.get(res, 'locals.userId');
-        const page = _.get(req, 'body.page');
+        const userId = _.get(res, 'locals.userId');
+        const data = _.get(req, 'body.data');
 
-        const isOwner =
-            _.isNil(_.get(page, 'owner'))
-                || (_.isString(currentUserId)
-                && currentUserId === _.get(page, 'owner'));
-
-        if (_.isObject(page) && isOwner) {
-            await firebaseActions.pages.addPage(page)
+        if (_.isObject(data)) {
+            await firebaseActions.pages.addPage(data, userId)
                 .then((createdPage) => {
                     res.status(201).json(createdPage);
                 })
                 .catch(() => {
                     res.status(403).send('An unknown error occurred while creating the page!');
                 });
-        } else if (!isOwner) {
-            res.status(403).send('Page owners do not match!');
         } else {
-            res.status(500).send('Provided an invalid page!');
+            res.status(500).send('Provided invalid data!');
+        }
+    });
+
+    server.post('/firebase/updatePage', isLocal, async (req, res) => {
+        const currentUserId = _.get(res, 'locals.userId');
+        const data = _.get(req, 'body.data');
+        const id = _.get(req, 'body.id');
+
+        await firebaseActions.pages.fetchPageById(id)
+            .then(async (page) => {
+                if (_.isObject(page) && _.has(page, 'owner') && currentUserId === page.owner) {
+                    await firebaseActions.pages.updatePage(page, data)
+                        .then(() => {
+                            res.status(201).send('Updated page successfully!');
+                        })
+                        .catch(() => {
+                            res.status(403).send('An unknown error occurred while creating the page!');
+                        });
+                } else if (currentUserId !== page.owner) {
+                    res.status(403).send('Page owners do not match!');
+                } else {
+                    res.status(500).send('Provided an invalid page!');
+                }
+            });
+    });
+
+    server.post('/firebase/deletePage', isLocal, async (req, res) => {
+        const currentUserId = _.get(res, 'locals.userId');
+        const id = _.get(req, 'body.id');
+
+        if (_.isString(id)) {
+            await firebaseActions.pages.fetchPageById(id)
+                .then(async (page) => {
+                    if (_.isObject(page) && _.has(page, 'owner') && currentUserId === page.owner) {
+                        await firebaseActions.pages.deletePage(id)
+                            .then(() => {
+                                res.status(200).send('Deleted page successfully!');
+                            })
+                            .catch(() => {
+                                res.status(403).send('An unknown error occurred while deleting the page!');
+                            });
+                    }
+                });
+        } else {
+            res.status(500).send('Provided an empty id!');
         }
     });
 };

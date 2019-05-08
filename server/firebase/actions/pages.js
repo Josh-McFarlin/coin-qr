@@ -3,8 +3,16 @@ const _ = require('lodash');
 const firebase = require('../index');
 const hashUtils = require('../../../utils/hash');
 
+
 // ~~~~~ Fetch ~~~~~
-module.exports.fetchPage = (postId) =>
+const fetchPageById = (id) =>
+    firebase.firestore()
+        .collection('pages')
+        .doc(id)
+        .get()
+        .then((page) => page.data());
+
+const fetchPageByPostId = (postId) =>
     firebase.firestore()
         .collection('pages')
         .where('postId', '==', postId)
@@ -12,7 +20,7 @@ module.exports.fetchPage = (postId) =>
         .get()
         .then((querySnapshot) => querySnapshot.docs[0].data());
 
-module.exports.fetchRecent = (userId) => {
+const fetchRecent = (userId) => {
     let pages = firebase.firestore().collection('pages');
 
     if (_.isString(userId)) {
@@ -45,40 +53,55 @@ module.exports.fetchRecent = (userId) => {
 
 
 // ~~~~~ Set ~~~~~
-module.exports.addPage = (page) => {
-    const pageClone = _.cloneDeep(page);
-
-    const date = new Date();
-    pageClone.created = firebase.firestore.Timestamp.fromDate(date);
-    pageClone.modified = firebase.firestore.Timestamp.fromDate(date);
-
+const addPage = (data, owner) => {
     const docRef = firebase.firestore()
         .collection('pages')
         .doc();
 
-    pageClone.postId = hashUtils.hashUID(docRef.id);
+    const curDate = firebase.firestore.Timestamp.fromDate(new Date());
+
+    const page = {
+        created: curDate,
+        modified: curDate,
+        postId: hashUtils.hashUID(docRef.id),
+        id: docRef.id,
+        data,
+        owner
+    };
+
+    if (_.isString(owner)) {
+        page.owner = owner;
+    }
 
     return docRef
-        .set(pageClone)
-        .then(() => pageClone);
+        .set(page)
+        .then(() => page);
 };
 
-module.exports.updatePage = (page) => {
-    const pageClone = _.cloneDeep(page);
-    const date = new Date();
-
-    pageClone.modified = firebase.firestore.Timestamp.fromDate(date);
+const updatePage = (page, data) => {
+    const modified = firebase.firestore.Timestamp.fromDate(new Date());
 
     return firebase.firestore()
         .collection('pages')
-        .doc(pageClone.postId)
-        .update(pageClone)
-        .then(() => pageClone);
+        .doc(page.postId)
+        .update({
+            data,
+            modified
+        });
 };
 
-module.exports.deletePage = (postId) =>
+const deletePage = (postId) =>
     firebase.firestore()
         .collection('pages')
         .doc(postId)
         .delete();
 // ~~~~~~~~~~~~~~~
+
+module.exports = {
+    fetchPageById,
+    fetchPageByPostId,
+    fetchRecent,
+    addPage,
+    updatePage,
+    deletePage
+};
