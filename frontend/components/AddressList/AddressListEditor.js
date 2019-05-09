@@ -6,8 +6,8 @@ import {
     Modal, ModalBody, ModalHeader, ModalFooter, Form, FormInput, FormGroup
 } from 'shards-react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import Select from 'react-select';
 import _ from 'lodash';
+import VirtualizedSelect from 'react-virtualized-select';
 
 import AddressRow from './AddressRow';
 import AvailableCoins from '../../utils/availableCoins';
@@ -71,17 +71,17 @@ class AddressListEditor extends React.PureComponent {
         }));
     };
 
-    handleChange = (e, meta) => {
-        const name = e.target ? e.target.name : meta.name;
-        const value = e.target ? e.target.value : e;
+    handleChange = (props) => {
+        const name = _.get(props, 'target.name', 'newCoinType');
+        const value = _.get(props, 'target.value', props);
 
         this.setState({
             [name]: value
         }, () => {
             this.setState((prevState) => ({
                 newValid: _.isObject(prevState.newCoinType)
-                && _.isString(prevState.newAddress)
-                && prevState.newAddress.length !== 0
+                    && _.isString(prevState.newAddress)
+                    && prevState.newAddress.length !== 0
             }));
         });
     };
@@ -196,8 +196,7 @@ class AddressListEditor extends React.PureComponent {
                         <Form>
                             <FormGroup>
                                 <label>Coin Type</label>
-                                <Select
-                                    name='newCoinType'
+                                <VirtualizedSelect
                                     options={AvailableCoins}
                                     onChange={this.handleChange}
                                     value={newCoinType}

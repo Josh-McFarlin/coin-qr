@@ -254,7 +254,6 @@ class EditPage extends React.PureComponent {
 EditPage.propTypes = {
     classes: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
-    isMobile: PropTypes.bool.isRequired,
     userId: PropTypes.string,
     isNewPage: PropTypes.bool,
     error: PropTypes.object,

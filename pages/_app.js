@@ -6,12 +6,15 @@ import JssProvider from 'react-jss/lib/JssProvider';
 import withStyles, { ThemeProvider } from 'react-jss';
 import { Container } from 'shards-react';
 import MobileDetect from 'mobile-detect';
+import _ from 'lodash';
 
 import PageContext from '../frontend/utils/pageContext';
 import NavBar from '../frontend/components/NavBar/NavBar';
 import 'bootstrap-css-only';
 import 'shards-ui/dist/css/shards.min.css';
-import _ from 'lodash';
+import 'react-select/dist/react-select.css';
+import 'react-virtualized/styles.css';
+import 'react-virtualized-select/styles.css';
 
 
 const styles = (theme) => ({
