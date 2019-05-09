@@ -8,7 +8,7 @@ A tool to generate a single QR code to receive payments in multiple cryptocurren
 
 ## Status
 This project is currently in development, but is very close to completion.
-I am currently finishing the move from fetching data from Firebase on the client to the server.
+At this point all functionality is complete, and I am making the finishing touches for performance and security.
 When the tool is finished, I will be publicly hosting it on Heroku or Zeit for anyone to use.
 
 ## Tech Stack

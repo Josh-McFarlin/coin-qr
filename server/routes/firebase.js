@@ -6,10 +6,16 @@ const admin = require('../firebase');
 const hashUtils = require('../../utils/hash');
 
 
-const speedLimiter = slowDown({
+const authSpeedLimiter = slowDown({
     windowMs: 5 * 60 * 1000, // 5 minutes
-    delayAfter: 10, // allow 10 requests to go at full-speed, then...
-    delayMs: 500 // 11th request has a 500ms delay, 12th has a 1000ms delay, 13th gets 1500ms, etc.
+    delayAfter: 20, // allow 20 requests to go at full-speed, then...
+    delayMs: 500 // 21st request has a 500ms delay, 22nd has a 1000ms delay, 23rd has a 1500ms delay, etc.
+});
+
+const publicSpeedLimiter = slowDown({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    delayAfter: 3, // allow 10 requests to go at full-speed, then...
+    delayMs: 500 // 4th request has a 500ms delay, 5th has a 1000ms delay, 6th has a 1500ms delay, etc.
 });
 
 async function isRealUser(req, res, cont) {
@@ -33,7 +39,7 @@ async function isRealUser(req, res, cont) {
 
 module.exports = (server) => {
     // ~~~~~ Pages ~~~~~
-    server.post('/firebase/addPage', speedLimiter, isRealUser, async (req, res) => {
+    server.post('/firebase/addPage', publicSpeedLimiter, async (req, res) => {
         const userId = _.get(res, 'locals.authedUid');
         const data = _.get(req, 'body.data');
 
@@ -50,7 +56,7 @@ module.exports = (server) => {
         }
     });
 
-    server.post('/firebase/updatePage', speedLimiter, isRealUser, async (req, res) => {
+    server.post('/firebase/updatePage', authSpeedLimiter, isRealUser, async (req, res) => {
         const currentUserId = _.get(res, 'locals.authedUid');
         const data = _.get(req, 'body.data');
         const id = _.get(req, 'body.id');
@@ -73,7 +79,7 @@ module.exports = (server) => {
             });
     });
 
-    server.post('/firebase/deletePage', speedLimiter, isRealUser, async (req, res) => {
+    server.post('/firebase/deletePage', authSpeedLimiter, isRealUser, async (req, res) => {
         const currentUserId = _.get(res, 'locals.authedUid');
         const id = _.get(req, 'body.id');
 
@@ -97,7 +103,7 @@ module.exports = (server) => {
     // ~~~~~~~~~~~~~~~~~~~~
 
     // ~~~~~ Profiles ~~~~~
-    server.post('/firebase/createProfile', speedLimiter, isRealUser, async (req, res) => {
+    server.post('/firebase/createProfile', authSpeedLimiter, isRealUser, async (req, res) => {
         const currentUserId = _.get(res, 'locals.authedUid');
 
         await firebaseActions.profiles.fetchProfile(hashUtils.hashUID(currentUserId))
@@ -119,7 +125,7 @@ module.exports = (server) => {
             });
     });
 
-    server.post('/firebase/updateProfile', speedLimiter, isRealUser, async (req, res) => {
+    server.post('/firebase/updateProfile', authSpeedLimiter, isRealUser, async (req, res) => {
         const currentUserId = _.get(res, 'locals.authedUid');
         const data = _.get(req, 'body.data');
 

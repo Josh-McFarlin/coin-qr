@@ -29,7 +29,11 @@ export const registerNewUser = (email, password) =>
                 .then(() => firebase.auth().signOut())
                 .then(() => createProfile())
                 .then(() => {
-                    window.location.assign(urls.home());
+                    try {
+                        window.location.assign(urls.profile.view(user.user.uid));
+                    } catch (error) {
+                        window.location.assign(urls.home());
+                    }
                 });
         });
 

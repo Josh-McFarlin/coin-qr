@@ -32,13 +32,13 @@ const fetchProfile = (id) =>
 
 // ~~~~~ Set ~~~~~
 const createProfile = (userId) => {
-    const date = new Date();
+    const curDate = firebase.firestore.FieldValue.serverTimestamp();
 
     const profileId = hashUtils.hashUID(userId);
 
     const profile = {
-        created: firebase.firestore.Timestamp.fromDate(date),
-        modified: firebase.firestore.Timestamp.fromDate(date),
+        created: curDate,
+        modified: curDate,
         userId,
         profileId,
         data: {
@@ -56,7 +56,7 @@ const createProfile = (userId) => {
 };
 
 const updateProfile = (data, userId) => {
-    const modified = firebase.firestore.Timestamp.fromDate(new Date());
+    const modified = firebase.firestore.FieldValue.serverTimestamp();
 
     return firebase.firestore()
         .collection('profiles')

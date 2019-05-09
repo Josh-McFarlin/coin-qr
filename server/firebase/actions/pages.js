@@ -58,15 +58,14 @@ const addPage = (data, owner) => {
         .collection('pages')
         .doc();
 
-    const curDate = firebase.firestore.Timestamp.fromDate(new Date());
+    const curDate = firebase.firestore.FieldValue.serverTimestamp();
 
     const page = {
         created: curDate,
         modified: curDate,
         postId: hashUtils.hashUID(docRef.id),
         id: docRef.id,
-        data,
-        owner
+        data
     };
 
     if (_.isString(owner)) {
@@ -79,7 +78,7 @@ const addPage = (data, owner) => {
 };
 
 const updatePage = (page, data) => {
-    const modified = firebase.firestore.Timestamp.fromDate(new Date());
+    const modified = firebase.firestore.FieldValue.serverTimestamp();
 
     return firebase.firestore()
         .collection('pages')

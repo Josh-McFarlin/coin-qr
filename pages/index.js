@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import withStyles from 'react-jss';
 import { Row, Col, Card, CardBody, CardHeader } from 'shards-react';
 
+import urls from '../utils/urls';
+
 
 const styles = () => ({
     header: {
@@ -83,6 +85,23 @@ class IndexPage extends React.PureComponent {
                                         a single QR code on their artwork, but accept donations in any number of cryptocurrencies.
                                         And if they later decide to change the receiving address of a wallet, they can easily change
                                         the address online instead of having to paint over the old QR Code.
+                                    </p>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Card
+                                tag='a'
+                                href={urls.qr.view('yP4m9')}
+                            >
+                                <CardHeader className={classes.header}>
+                                    Support This Project
+                                </CardHeader>
+                                <CardBody>
+                                    <p>
+                                        You can find the QR Page for this tool here.
                                     </p>
                                 </CardBody>
                             </Card>
