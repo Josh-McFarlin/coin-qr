@@ -60,6 +60,12 @@ const styles = () => ({
     },
     qrButton: {
         float: 'right'
+    },
+    buttonHolder: {
+        marginLeft: 'auto'
+    },
+    noLeftPadding: {
+        paddingLeft: 0
     }
 });
 
@@ -102,6 +108,13 @@ class ViewProfilePage extends React.PureComponent {
             );
         }
 
+        const thisUrl = `${urls.base}${urls.profile.view(profile.profileId)}`;
+
+        const isOwner =
+            _.has(profile, 'userId')
+            && _.isString(userId)
+            && profile.userId === userId;
+
         const profileSection = (
             <Card>
                 <CardHeader className={classes.header}>
@@ -127,8 +140,38 @@ class ViewProfilePage extends React.PureComponent {
                                 </Col>
                             </Row>
                         </Col>
-                        <Col sm={10}>
-                            {_.get(profile, 'data.bio')}
+                        <Col sm={10} className={classes.flexColumn}>
+                            <Row className={classes.flexFill}>
+                                {_.get(profile, 'data.bio')}
+                            </Row>
+                            <Row className={classes.rowNoPadding}>
+                                <div className={classes.buttonHolder}>
+                                    {isOwner && (
+                                        <Button
+                                            className='mr-3'
+                                            theme='primary'
+                                            href={urls.myProfile.edit()}
+                                        >
+                                            Edit Profile
+                                        </Button>
+                                    )}
+                                    <Button
+                                        theme='primary'
+                                        onClick={this.toggleModal}
+                                        className={classes.qrButton}
+                                    >
+                                        View QR
+                                    </Button>
+                                    <PageQRCode
+                                        modalOpen={modalOpen}
+                                        modalInfo={{
+                                            address: thisUrl,
+                                            coinType: 'Page'
+                                        }}
+                                        closeModal={this.toggleModal}
+                                    />
+                                </div>
+                            </Row>
                         </Col>
                     </Row>
                 </CardBody>
@@ -140,43 +183,6 @@ class ViewProfilePage extends React.PureComponent {
                 className={classes.fullHeight}
                 addresses={_.get(profile, 'data.addresses', [])}
             />
-        );
-
-        const thisUrl = `${urls.base}${urls.profile.view(profile.profileId)}`;
-
-        const isOwner =
-            _.has(profile, 'userId')
-            && _.isString(userId)
-            && profile.userId === userId;
-
-        const buttonsSection = (
-            <Card>
-                <CardBody>
-                    {isOwner && (
-                        <Button
-                            theme='primary'
-                            href={urls.myProfile.edit()}
-                        >
-                            Edit Profile
-                        </Button>
-                    )}
-                    <Button
-                        theme='primary'
-                        onClick={this.toggleModal}
-                        className={classes.qrButton}
-                    >
-                        View QR
-                    </Button>
-                    <PageQRCode
-                        modalOpen={modalOpen}
-                        modalInfo={{
-                            address: thisUrl,
-                            coinType: 'Page'
-                        }}
-                        closeModal={this.toggleModal}
-                    />
-                </CardBody>
-            </Card>
         );
 
         const recentSection = (
@@ -204,11 +210,6 @@ class ViewProfilePage extends React.PureComponent {
                         <Row>
                             <Col>
                                 {profileSection}
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                {buttonsSection}
                             </Col>
                         </Row>
                         <Row>
@@ -241,12 +242,7 @@ class ViewProfilePage extends React.PureComponent {
                             </Col>
                         </Row>
                     </Col>
-                    <Col sm={4} className={classNames(classes.fullHeight, classes.flexColumn)}>
-                        <Row>
-                            <Col>
-                                {buttonsSection}
-                            </Col>
-                        </Row>
+                    <Col sm={4} className={classNames(classes.fullHeight, classes.flexColumn, classes.noLeftPadding)}>
                         <Row className={classes.flexFill}>
                             <Col className={classes.fullHeight}>
                                 {recentSection}

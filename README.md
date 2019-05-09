@@ -27,3 +27,12 @@ When the tool is finished, I will be publicly hosting it on Heroku or Zeit for a
 ### Terms
 The full Terms of Use can be found in the Terms component and will be on the website, but to be simple:
 This tool and its creator is not responsible for lost or incorrectly sent funds.
+
+---
+
+### Screenshots
+![Home](./screenshots/home.png)
+![QR Page](./screenshots/qr-page.png)
+![QR Page with open address modal](./screenshots/qr-page-open.png)
+![Create Page](./screenshots/create.png)
+![Profile Page](./screenshots/profile-page.png)
