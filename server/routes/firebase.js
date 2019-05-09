@@ -3,12 +3,13 @@ const slowDown = require('express-slow-down');
 
 const firebaseActions = require('../firebase/actions');
 const admin = require('../firebase');
+const hashUtils = require('../../utils/hash');
 
 
 const speedLimiter = slowDown({
-    windowMs: 10 * 60 * 1000, // 15 minutes
-    delayAfter: 5, // allow 5 requests to go at full-speed, then...
-    delayMs: 200 // 6th request has a 200ms delay, 7th has a 400ms delay, 8th gets 600ms, etc.
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    delayAfter: 10, // allow 10 requests to go at full-speed, then...
+    delayMs: 500 // 11th request has a 500ms delay, 12th has a 1000ms delay, 13th gets 1500ms, etc.
 });
 
 async function isRealUser(req, res, cont) {
@@ -23,14 +24,15 @@ async function isRealUser(req, res, cont) {
                 cont();
             })
             .catch(() => {
-                res.status(403).send('This route is for internal use only!');
+                res.status(403).send('You must be authenticated to use this route!');
             });
     } else {
-        res.status(403).send('This route is for internal use only!');
+        res.status(403).send('You must be authenticated to use this route!');
     }
 }
 
 module.exports = (server) => {
+    // ~~~~~ Pages ~~~~~
     server.post('/firebase/addPage', speedLimiter, isRealUser, async (req, res) => {
         const userId = _.get(res, 'locals.authedUid');
         const data = _.get(req, 'body.data');
@@ -41,10 +43,10 @@ module.exports = (server) => {
                     res.status(201).json(createdPage);
                 })
                 .catch(() => {
-                    res.status(403).send('An unknown error occurred while creating the page!');
+                    res.status(500).send('An unknown error occurred while creating the page!');
                 });
         } else {
-            res.status(500).send('Provided invalid data!');
+            res.status(400).send('Provided invalid data!');
         }
     });
 
@@ -61,12 +63,12 @@ module.exports = (server) => {
                             res.status(201).send('Updated page successfully!');
                         })
                         .catch(() => {
-                            res.status(403).send('An unknown error occurred while creating the page!');
+                            res.status(500).send('An unknown error occurred while creating the page!');
                         });
                 } else if (currentUserId !== page.owner) {
                     res.status(403).send('Page owners do not match!');
                 } else {
-                    res.status(500).send('Provided an invalid page!');
+                    res.status(400).send('Provided an invalid page!');
                 }
             });
     });
@@ -84,12 +86,61 @@ module.exports = (server) => {
                                 res.status(200).send('Deleted page successfully!');
                             })
                             .catch(() => {
-                                res.status(403).send('An unknown error occurred while deleting the page!');
+                                res.status(500).send('An unknown error occurred while deleting the page!');
                             });
                     }
                 });
         } else {
-            res.status(500).send('Provided an empty id!');
+            res.status(400).send('Provided an empty id!');
         }
     });
+    // ~~~~~~~~~~~~~~~~~~~~
+
+    // ~~~~~ Profiles ~~~~~
+    server.post('/firebase/createProfile', speedLimiter, isRealUser, async (req, res) => {
+        const currentUserId = _.get(res, 'locals.authedUid');
+
+        await firebaseActions.profiles.fetchProfile(hashUtils.hashUID(currentUserId))
+            .then((profile) => {
+                if (_.isObject(profile)) {
+                    res.status(409).send('Attempted to create a profile for an existing user!');
+                } else {
+                    throw new Error('Empty profile in Firebase, can overwrite.');
+                }
+            })
+            .catch(async () => {
+                await firebaseActions.profiles.createProfile(currentUserId)
+                    .then(() => {
+                        res.status(200).send('Profile created successfully!');
+                    })
+                    .catch(() => {
+                        res.status(500).send('An unknown error occurred while creating the profile!');
+                    });
+            });
+    });
+
+    server.post('/firebase/updateProfile', speedLimiter, isRealUser, async (req, res) => {
+        const currentUserId = _.get(res, 'locals.authedUid');
+        const data = _.get(req, 'body.data');
+
+        if (_.isObject(data)) {
+            await firebaseActions.profiles.fetchProfile(hashUtils.hashUID(currentUserId))
+                .then(async (profile) => {
+                    if (currentUserId === profile.userId) {
+                        await firebaseActions.profiles.updateProfile(data, currentUserId)
+                            .then(() => {
+                                res.status(201).send('Updated profile successfully!');
+                            })
+                            .catch(() => {
+                                res.status(500).send('An unknown error occurred while updating the profile!');
+                            });
+                    } else {
+                        res.status(403).send('Profile owners do not match!');
+                    }
+                });
+        } else {
+            res.status(400).send('Provided invalid data!');
+        }
+    });
+    // ~~~~~~~~~~~~~~~~~~~~
 };

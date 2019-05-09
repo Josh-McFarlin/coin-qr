@@ -1,13 +1,22 @@
-import Hashids from 'hashids';
-import _ from 'lodash';
+export const createProfile = () =>
+    fetch('/firebase/createProfile', {
+        method: 'post',
+        mode: 'same-origin',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
 
-import firebase from '../index';
-
-
-export const createProfile = (user) => {
-    // TODO: POST Profile
-};
-
-export const updateProfile = (data, id) => {
-    // TODO: POST Profile
-};
+export const updateProfile = (data) =>
+    fetch('/firebase/updateProfile', {
+        method: 'post',
+        mode: 'same-origin',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            data
+        })
+    });

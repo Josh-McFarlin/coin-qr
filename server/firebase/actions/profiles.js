@@ -5,7 +5,7 @@ const hashUtils = require('../../../utils/hash');
 
 
 // ~~~~~ Fetch ~~~~~
-module.exports.fetchProfile = (id) =>
+const fetchProfile = (id) =>
     firebase.firestore()
         .collection('profiles')
         .doc(id)
@@ -25,13 +25,13 @@ module.exports.fetchProfile = (id) =>
                 return data;
             }
 
-            throw Error('Profile not found');
+            throw new Error('Profile not found');
         });
 // ~~~~~~~~~~~~~~~
 
 
 // ~~~~~ Set ~~~~~
-module.exports.createProfile = (userId) => {
+const createProfile = (userId) => {
     const date = new Date();
 
     const profileId = hashUtils.hashUID(userId);
@@ -52,20 +52,24 @@ module.exports.createProfile = (userId) => {
     return firebase.firestore()
         .collection('profiles')
         .doc(profileId)
-        .set(profile)
-        .then(() => profile);
+        .set(profile);
 };
 
-module.exports.updateProfile = (profile) => {
-    const profileClone = _.cloneDeep(profile);
-    const date = new Date();
-
-    profileClone.modified = firebase.firestore.Timestamp.fromDate(date);
+const updateProfile = (data, userId) => {
+    const modified = firebase.firestore.Timestamp.fromDate(new Date());
 
     return firebase.firestore()
         .collection('profiles')
-        .doc(profileClone.profileId)
-        .update(profileClone)
-        .then(() => profileClone);
+        .doc(hashUtils.hashUID(userId))
+        .update({
+            data,
+            modified
+        });
 };
 // ~~~~~~~~~~~~~~~
+
+module.exports = {
+    fetchProfile,
+    createProfile,
+    updateProfile
+};

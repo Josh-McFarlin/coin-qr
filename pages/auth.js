@@ -135,7 +135,8 @@ class AuthPage extends React.PureComponent {
 
     toggleRegister = () => {
         this.setState((prevState) => ({
-            isRegistering: !prevState.isRegistering
+            isRegistering: !prevState.isRegistering,
+            error: null
         }));
     };
 

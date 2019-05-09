@@ -18,7 +18,7 @@ const styles = () => ({
 });
 
 const TermsModal = ({ classes, isOpen, toggleModal }) => (
-    <Modal open={isOpen} size='lg' toggle={toggleModal}>
+    <Modal open={isOpen} size='lg' toggle={() => {}}>
         <ModalHeader>Security and Terms of Use</ModalHeader>
         <ModalBody className={classes.modalBody}>
             <h5>Security</h5>
@@ -46,17 +46,14 @@ const TermsModal = ({ classes, isOpen, toggleModal }) => (
                     before sending a transaction!
                 </li>
                 <li>
+                    Furthermore, his tool and all information, software, photos, text, and other materials found on this website,
+                    is intended for lawful use by members of the general public who are over the age of 13 and citizens of the United States or Canada.
+                    Those who choose to access this tool from other locations do so on their own initiative and are responsible for compliance with applicable local laws.
+                </li>
+                <li>
                     Your continued use of this tool shows you voluntarily agree with all terms, and acknowledge
                     CryptoQR and its owner is not, and cannot, be held liable for any issues that may arise while
                     using the tool.
-                </li>
-                <li>
-                    This tool and all information, software, photos, text, and other materials found on this website,
-                    is intended for lawful use by members of the general public who are over the age of 13 and citizens of the United States or Canada.
-                </li>
-                <li>
-                    CryptoQR and its owner make no guarantee the tool (and mostly cryptocurrency in general) is legal in your jurisdiction.
-                    Those who choose to access this tool from other locations do so on their own initiative and are responsible for compliance with applicable local laws.
                 </li>
             </ul>
         </ModalBody>

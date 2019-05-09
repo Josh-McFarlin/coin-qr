@@ -1,47 +1,9 @@
 import Cookies from 'universal-cookie';
-import Hashids from 'hashids';
 
 import firebase from '../index';
 import urls from '../../../utils/urls';
+import { createProfile } from './profiles';
 
-
-const createProfile = (user) => {
-    const date = new Date();
-
-    const hashids = new Hashids(user.uid, 5);
-    const profileId = hashids.encode(1);
-
-    const profile = {
-        created: firebase.firestore.Timestamp.fromDate(date),
-        modified: firebase.firestore.Timestamp.fromDate(date),
-        userId: user.uid,
-        data: {
-            profileId,
-            bio: '',
-            email: {
-                email: user.email,
-                public: false
-            },
-            featuredPage: {
-                featuredPage: '',
-                public: false
-            },
-            name: {
-                name: '',
-                public: false
-            },
-            picture: {
-                picture: '',
-                public: false
-            }
-        }
-    };
-
-    return firebase.firestore()
-        .collection('profiles')
-        .doc(profileId)
-        .set(profile);
-};
 
 export const registerNewUser = (email, password) =>
     firebase.auth()
@@ -49,8 +11,6 @@ export const registerNewUser = (email, password) =>
         .then((user) => {
             const cookies = new Cookies();
             const csrfToken = cookies.get('csrfToken');
-
-            createProfile(user.user);
 
             user.user.getIdToken()
                 .then((idToken) =>
@@ -67,6 +27,7 @@ export const registerNewUser = (email, password) =>
                         })
                     }))
                 .then(() => firebase.auth().signOut())
+                .then(() => createProfile())
                 .then(() => {
                     window.location.assign(urls.home());
                 });
