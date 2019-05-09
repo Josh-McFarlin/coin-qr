@@ -11,6 +11,7 @@ import {
     Row,
     Button
 } from 'shards-react';
+import classNames from 'classnames';
 
 import Error from './_error';
 import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
@@ -21,18 +22,11 @@ import urls from '../utils/urls';
 
 
 const styles = () => ({
-    actionButtons: {
-        display: 'flex',
-        justifyContent: 'space-between'
-    },
     header: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         fontWeight: 700
-    },
-    fullWidth: {
-        width: '100%'
     },
     fullHeight: {
         height: '100%'
@@ -235,7 +229,7 @@ class ViewProfilePage extends React.PureComponent {
         return (
             <React.Fragment>
                 <Row className={classes.fullHeight}>
-                    <Col sm={8} className={`${classes.fullHeight} ${classes.flexColumn}`}>
+                    <Col sm={8} className={classNames(classes.fullHeight, classes.flexColumn)}>
                         <Row>
                             <Col>
                                 {profileSection}
@@ -247,7 +241,7 @@ class ViewProfilePage extends React.PureComponent {
                             </Col>
                         </Row>
                     </Col>
-                    <Col sm={4} className={`${classes.fullHeight} ${classes.flexColumn}`}>
+                    <Col sm={4} className={classNames(classes.fullHeight, classes.flexColumn)}>
                         <Row>
                             <Col>
                                 {buttonsSection}

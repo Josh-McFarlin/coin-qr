@@ -16,31 +16,14 @@ import urls from '../utils/urls';
 
 
 const styles = () => ({
-    actionButtons: {
-        display: 'flex',
-        justifyContent: 'space-between'
-    },
     header: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         fontWeight: 700
     },
-    fullWidth: {
-        width: '100%'
-    },
     fullHeight: {
         height: '100%'
-    },
-    flexColumn: {
-        display: 'flex',
-        flexDirection: 'column'
-    },
-    flexFill: {
-        flex: 1
-    },
-    profileName: {
-        padding: 0
     },
     profileCol: {
         display: 'flex',
@@ -52,15 +35,8 @@ const styles = () => ({
         maxWidth: 150,
         borderRadius: '50%'
     },
-    scrollBody: {
-        overflowX: 'hidden',
-        overflowY: 'auto'
-    },
     rowNoPadding: {
         paddingBottom: '0 !important'
-    },
-    noMarginBottom: {
-        marginBottom: 0
     },
     floatRight: {
         float: 'right'

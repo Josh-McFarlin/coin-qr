@@ -7,7 +7,6 @@ import {
     Button, Card, CardBody, CardHeader, CardFooter, Row, Col, Collapse,
     Form, FormGroup, FormInput, FormTextarea, FormFeedback, Alert
 } from 'shards-react';
-import classNames from 'classnames';
 
 import Error from './_error';
 import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
@@ -17,31 +16,20 @@ import urls from '../utils/urls';
 
 
 const styles = () => ({
-    actionButtons: {
-        display: 'flex',
-        justifyContent: 'space-between'
-    },
     header: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         fontWeight: 700
     },
-    minFullHeight: {
-        minHeight: '100%'
-    },
     fullHeight: {
         height: '100%'
     },
-    flexColumn: {
-        display: 'flex',
-        flexDirection: 'column'
-    },
-    flexFill: {
-        flex: 1
-    },
     floatRight: {
         float: 'right'
+    },
+    editor: {
+        minHeight: 300
     }
 });
 
@@ -157,7 +145,7 @@ class EditPage extends React.PureComponent {
     };
 
     render() {
-        const { classes, isNewPage, isMobile, error, userId } = this.props;
+        const { classes, isNewPage, error, userId } = this.props;
         const { data, editError, showDelete } = this.state;
 
         if (_.isObject(error)) {
@@ -185,7 +173,7 @@ class EditPage extends React.PureComponent {
                     </Alert>
                 </Collapse>
                 <Row>
-                    <Col className={classNames(classes.flexColumn)}>
+                    <Col>
                         <Row>
                             <Col>
                                 <Card>
@@ -240,11 +228,10 @@ class EditPage extends React.PureComponent {
                                 </Card>
                             </Col>
                         </Row>
-
-                        <Row className={classes.flexFill}>
-                            <Col className={classNames({ [classes.fullHeight]: !isMobile })}>
+                        <Row>
+                            <Col>
                                 <AddressListEditor
-                                    className={classes.fullHeight}
+                                    className={classes.editor}
                                     addresses={data.addresses}
                                     error={editError}
                                     updateAddresses={this.updateAddresses}

@@ -4,23 +4,10 @@ import withStyles from 'react-jss';
 import { Button, Modal, ModalBody, ModalHeader, ModalFooter } from 'shards-react';
 
 
-const styles = (theme) => ({
+const styles = () => ({
     header: {
         display: 'flex',
         justifyContent: 'center'
-    },
-    qrHolder: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    qrAddress: {
-        margin: `${2 * theme.spacing.unit}px 0`,
-        width: '100%',
-        wordBreak: 'break-all',
-        textAlign: 'center',
-        fontSize: 20
     }
 });
 

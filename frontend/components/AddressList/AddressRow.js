@@ -18,17 +18,6 @@ const styles = (theme) => ({
         overflow: 'hidden',
         textOverflow: 'ellipsis'
     },
-    qrHolder: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    qrAddress: {
-        marginTop: theme.spacing.unit,
-        marginBottom: 0,
-        textOverflow: 'ellipsis'
-    },
     removeButton: {
         width: 32,
         height: 32,

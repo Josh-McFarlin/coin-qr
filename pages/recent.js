@@ -75,7 +75,8 @@ class RecentPage extends React.PureComponent {
 
 RecentPage.propTypes = {
     classes: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired
+    router: PropTypes.object.isRequired,
+    recentPages: PropTypes.array.isRequired
 };
 
 export default withRouter(withStyles(styles)(RecentPage));
