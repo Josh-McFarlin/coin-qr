@@ -115,6 +115,10 @@ class ViewProfilePage extends React.PureComponent {
             && _.isString(userId)
             && profile.userId === userId;
 
+        const pictureSrc =
+            _.has(profile, 'data.picture') && !_.isEmpty(profile.data.picture) ?
+                profile.data.picture : noProfilePic;
+
         const profileSection = (
             <Card>
                 <CardHeader className={classes.header}>
@@ -134,7 +138,7 @@ class ViewProfilePage extends React.PureComponent {
                                 <Col className={classes.profileCol}>
                                     <img
                                         className={classes.profilePicture}
-                                        src={_.get(profile, 'data.picture', noProfilePic)}
+                                        src={pictureSrc}
                                         alt='Profile'
                                     />
                                 </Col>

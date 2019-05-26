@@ -5,12 +5,13 @@ import 'firebase/firestore';
 
 
 const config = {
-    apiKey: 'AIzaSyCOxxu5T3uuy6ySoI5pOSb3mza739pIUV4',
-    authDomain: 'crypto-qr.firebaseapp.com',
-    databaseURL: 'https://crypto-qr.firebaseio.com',
-    projectId: 'crypto-qr',
-    storageBucket: 'crypto-qr.appspot.com',
-    messagingSenderId: '444062320028'
+    apiKey: 'AIzaSyAXG55l9hgKgTaSmJU8Tw5YUjHQUC3ATVk',
+    authDomain: 'coin-qr.firebaseapp.com',
+    databaseURL: 'https://coin-qr.firebaseio.com',
+    projectId: 'coin-qr',
+    storageBucket: 'coin-qr.appspot.com',
+    messagingSenderId: '29450757109',
+    appId: '1:29450757109:web:6a045db5e040c596'
 };
 
 if (!firebase.apps.length) {

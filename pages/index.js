@@ -45,19 +45,19 @@ class IndexPage extends React.PureComponent {
 
                                     <br />
 
-                                    CryptoQR solves these problems and more
+                                    CoinQR solves these problems and more
                                     <ul>
                                         <li>
                                             Wallet owners can create a single page to host a collection of
-                                            addresses for any number of different cryptocurrencies
+                                            addresses for any number of different cryptocurrencies.
                                         </li>
                                         <li>
                                             After creating a QR Page, wallet owners can distribute the QR Code
-                                            or url for this page, and edit and add wallet addresses at any time
+                                            or url for this page, and edit and add wallet addresses at any time.
                                         </li>
                                         <li>
                                             QR Page urls are relatively short, which means they can use simple and
-                                            easily readable QR Codes
+                                            easily readable QR Codes.
                                         </li>
                                     </ul>
                                 </CardBody>
@@ -94,7 +94,7 @@ class IndexPage extends React.PureComponent {
                         <Col>
                             <Card
                                 tag='a'
-                                href={urls.qr.view('yP4m9')}
+                                href={urls.donate()}
                             >
                                 <CardHeader className={classes.header}>
                                     Support This Project

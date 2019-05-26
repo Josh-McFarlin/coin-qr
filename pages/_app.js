@@ -102,7 +102,7 @@ export default class MyApp extends App {
         return (
             <AppContainer>
                 <Head>
-                    <title>CryptoQR</title>
+                    <title>CoinQR</title>
                 </Head>
                 <JssProvider
                     registry={this.pageContext.sheetsRegistry}

@@ -26,7 +26,7 @@ const TermsModal = ({ classes, isOpen, toggleModal }) => (
                 <li>
                     Authentication and data-storage are provided by Google Firebase.
                     Login information is completely handled by Google and stored on their servers,
-                    this tool never stores any login information (on any data period) on its own server.
+                    this tool never stores any login information (or any data period) on a separate server.
                 </li>
                 <li>
                     <a
@@ -52,7 +52,7 @@ const TermsModal = ({ classes, isOpen, toggleModal }) => (
                 </li>
                 <li>
                     Your continued use of this tool shows you voluntarily agree with all terms, and acknowledge
-                    CryptoQR and its owner is not, and cannot, be held liable for any issues that may arise while
+                    this tool and its owner is not, and cannot, be held liable for any issues that may arise while
                     using the tool.
                 </li>
             </ul>

@@ -1,16 +1,18 @@
 const admin = require('firebase-admin');
 
-const serviceAccount = require('../../admin-credentials.json');
 
+const firebaseCertBuf = Buffer.from(process.env.FIREBASE_CERT, 'base64');
+const firebaseCert = JSON.parse(firebaseCertBuf.toString());
 
 const config = {
-    credential: admin.credential.cert(serviceAccount),
-    apiKey: 'AIzaSyCOxxu5T3uuy6ySoI5pOSb3mza739pIUV4',
-    authDomain: 'crypto-qr.firebaseapp.com',
-    databaseURL: 'https://crypto-qr.firebaseio.com',
-    projectId: 'crypto-qr',
-    storageBucket: 'crypto-qr.appspot.com',
-    messagingSenderId: '444062320028'
+    credential: admin.credential.cert(firebaseCert),
+    apiKey: 'AIzaSyAXG55l9hgKgTaSmJU8Tw5YUjHQUC3ATVk',
+    authDomain: 'coin-qr.firebaseapp.com',
+    databaseURL: 'https://coin-qr.firebaseio.com',
+    projectId: 'coin-qr',
+    storageBucket: 'coin-qr.appspot.com',
+    messagingSenderId: '29450757109',
+    appId: '1:29450757109:web:6a045db5e040c596'
 };
 
 if (!admin.apps.length) {

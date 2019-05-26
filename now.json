@@ -1,7 +1,0 @@
-{
-  "version": 2,
-  "builds": [
-    { "src": "static/css/*.css", "use": "@now/html-minifier" },
-    { "src": "package.json", "use": "@now/next" }
-  ]
-}

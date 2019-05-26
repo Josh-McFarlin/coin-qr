@@ -61,7 +61,7 @@ class NavBar extends React.PureComponent {
                     theme='primary'
                     expand='md'
                 >
-                    <NavbarBrand href={urls.home()}>CryptoQR</NavbarBrand>
+                    <NavbarBrand href={urls.home()}>CoinQR</NavbarBrand>
                     <NavbarToggler onClick={this.toggleDrawer} />
 
                     <Collapse open={drawerOpen} navbar>
