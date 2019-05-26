@@ -52,7 +52,7 @@ class RecentPage extends React.PureComponent {
                                             <tr
                                                 className={classes.row}
                                                 key={page.id}
-                                                onClick={() => router.push(urls.qr.view(page.id))}
+                                                onClick={() => router.push(urls.qr.view(page.postId))}
                                             >
                                                 <td>
                                                     {page.data.title}

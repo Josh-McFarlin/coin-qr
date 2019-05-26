@@ -11,7 +11,7 @@ const PageSection = ({ page }) => {
 
     return (
         <ListGroupItem
-            href={urls.qr.view(_.get(page, 'id'))}
+            href={urls.qr.view(_.get(page, 'postId'))}
             tag='a'
         >
             {_.get(page, 'data.title')}
