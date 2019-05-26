@@ -1,7 +1,7 @@
 {
   "name": "crypto-qr",
   "description": "A tool to generate a single QR code to receive payments in multiple cryptocurrencies",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Josh McFarlin",
   "license": "MIT",
   "private": false,
