@@ -21,6 +21,7 @@
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
+    "cross-env": "^5.2.0",
     "cryptocurrency-icons": "^0.11.0",
     "csurf": "^1.10.0",
     "express": "^4.16.4",
@@ -61,7 +62,6 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
-    "cross-env": "^5.2.0",
     "eslint": "^5.15.3",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.16.0",
