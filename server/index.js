@@ -49,7 +49,5 @@ nextApp.prepare().then(() => {
 
     require('./routes')(server);
 
-    const port = process.env.port || 3000;
-
-    server.use(handler).listen(port);
+    server.use(handler).listen(process.env.PORT || 3000);
 });
