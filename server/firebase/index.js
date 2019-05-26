@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 
 
-const firebaseCertBuf = Buffer.from(process.env.FIREBASE_CERT, 'base64');
+const firebaseCertBuf = Buffer.from(process.env.FIREBASE_CERT);
 const firebaseCert = JSON.parse(firebaseCertBuf.toString());
 
 const config = {
