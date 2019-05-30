@@ -38,16 +38,9 @@ const reorder = (list, startIndex, endIndex) => {
     return result;
 };
 
-const validURL = (str) => {
-    const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
-        + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
-        + '((\\d{1,3}\\.){3}\\d{1,3}))' // OR ip (v4) address
-        + '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' // port and path
-        + '(\\?[;&a-z\\d%_.~+=-]*)?' // query string
-        + '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+const urlRegex = /https?:\/\//;
 
-    return !!pattern.test(str);
-};
+const validURL = (str) => str.match(urlRegex);
 
 const validateAddress = (address, coinType) => {
     if (_.isNil(coinType)) {
@@ -58,6 +51,13 @@ const validateAddress = (address, coinType) => {
     }
 
     if (_.isEmpty(address)) {
+        return {
+            newValid: false,
+            validMessage: 'Please provide an address!'
+        };
+    }
+
+    if (address.length >= 60) {
         return {
             newValid: false,
             validMessage: 'Please provide an address!'
@@ -131,12 +131,16 @@ class AddressListEditor extends React.PureComponent {
         const name = _.get(props, 'target.name', 'newCoinType');
         const value = _.get(props, 'target.value', props);
 
-        this.setState({
-            [name]: value
-        }, () => {
-            this.setState((prevState) =>
-                validateAddress(prevState.newAddress, prevState.newCoinType.value));
-        });
+        if (name === 'newAddress') {
+            this.setState((prevState) => ({
+                newAddress: value,
+                ...validateAddress(value, prevState.newCoinType.value)
+            }));
+        } else {
+            this.setState({
+                [name]: value
+            });
+        }
     };
 
     addAddress = () => {
