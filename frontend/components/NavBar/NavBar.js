@@ -94,24 +94,7 @@ class NavBar extends React.PureComponent {
                             )}
                         </Nav>
                         <Nav navbar className='ml-auto'>
-                            <NavItem className={classes.navItem}>
-                                <NavLink
-                                    onClick={this.toggleTerms}
-                                >
-                                    Terms
-                                </NavLink>
-                            </NavItem>
-                            {_.isNil(userId) && (
-                                <NavItem className={classes.navItem}>
-                                    <NavLink
-                                        active={router.asPath === urls.auth()}
-                                        href={urls.auth()}
-                                    >
-                                        Login
-                                    </NavLink>
-                                </NavItem>
-                            )}
-                            {_.isString(userId) && (
+                            {_.isString(userId) ? (
                                 <NavItem className={classes.navItem}>
                                     <NavLink
                                         onClick={this.handleSignout}
@@ -119,6 +102,24 @@ class NavBar extends React.PureComponent {
                                         Sign Out
                                     </NavLink>
                                 </NavItem>
+                            ) : (
+                                <React.Fragment>
+                                    <NavItem className={classes.navItem}>
+                                        <NavLink
+                                            onClick={this.toggleTerms}
+                                        >
+                                            Terms
+                                        </NavLink>
+                                    </NavItem>
+                                    <NavItem className={classes.navItem}>
+                                        <NavLink
+                                            active={router.asPath === urls.auth()}
+                                            href={urls.auth()}
+                                        >
+                                            Login
+                                        </NavLink>
+                                    </NavItem>
+                                </React.Fragment>
                             )}
                         </Nav>
                     </Collapse>
@@ -140,7 +141,7 @@ NavBar.propTypes = {
 };
 
 NavBar.defaultProps = {
-    user: null
+    userId: null
 };
 
 export default withRouter(withStyles(styles)(NavBar));

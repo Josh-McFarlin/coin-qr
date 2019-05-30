@@ -8,6 +8,7 @@ import {
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
 import VirtualizedSelect from 'react-virtualized-select';
+import WAValidator from 'multicoin-address-validator';
 
 import AddressRow from './AddressRow';
 import AvailableCoins from '../../utils/availableCoins';
@@ -35,6 +36,61 @@ const reorder = (list, startIndex, endIndex) => {
     result.splice(endIndex, 0, removed);
 
     return result;
+};
+
+const validURL = (str) => {
+    const pattern = new RegExp('^(https?:\\/\\/)?' // protocol
+        + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
+        + '((\\d{1,3}\\.){3}\\d{1,3}))' // OR ip (v4) address
+        + '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' // port and path
+        + '(\\?[;&a-z\\d%_.~+=-]*)?' // query string
+        + '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+
+    return !!pattern.test(str);
+};
+
+const validateAddress = (address, coinType) => {
+    if (_.isNil(coinType)) {
+        return {
+            newValid: false,
+            validMessage: 'Please select a coin type!'
+        };
+    }
+
+    if (_.isEmpty(address)) {
+        return {
+            newValid: false,
+            validMessage: 'Please provide an address!'
+        };
+    }
+
+    if (address.includes(' ')) {
+        return {
+            newValid: false,
+            validMessage: 'An address cannot contain a space!'
+        };
+    }
+
+    if (validURL(address)) {
+        return {
+            newValid: false,
+            validMessage: 'Provide an address, not a URL!'
+        };
+    }
+
+    try {
+        const valid = WAValidator.validate(address, coinType);
+
+        return {
+            newValid: valid,
+            validMessage: valid ? null : `Not a valid ${coinType} address!`
+        };
+    } catch (e) {
+        return {
+            newValid: true,
+            validMessage: 'Coin address validation not supported, but the address might be valid.'
+        };
+    }
 };
 
 class AddressListEditor extends React.PureComponent {
@@ -78,11 +134,8 @@ class AddressListEditor extends React.PureComponent {
         this.setState({
             [name]: value
         }, () => {
-            this.setState((prevState) => ({
-                newValid: _.isObject(prevState.newCoinType)
-                    && _.isString(prevState.newAddress)
-                    && prevState.newAddress.length !== 0
-            }));
+            this.setState((prevState) =>
+                validateAddress(prevState.newAddress, prevState.newCoinType.value));
         });
     };
 
@@ -126,7 +179,7 @@ class AddressListEditor extends React.PureComponent {
 
     render() {
         const { classes, className, addresses, error } = this.props;
-        const { modalOpen, newAddress, newCoinType } = this.state;
+        const { modalOpen, newAddress, newCoinType, newValid, validMessage } = this.state;
 
         return (
             <React.Fragment>
@@ -214,14 +267,14 @@ class AddressListEditor extends React.PureComponent {
                                 <label>Coin Address</label>
                                 <FormInput
                                     name='newAddress'
-                                    invalid={newAddress.length === 0}
+                                    invalid={!newValid}
                                     placeholder='Address'
                                     className='mb-2'
                                     onChange={this.handleChange}
                                     value={newAddress}
                                 />
                                 <FormFeedback>
-                                    Please provide an address!
+                                    {_.defaultTo(validMessage, 'Not a valid address!')}
                                 </FormFeedback>
                             </FormGroup>
                         </Form>
