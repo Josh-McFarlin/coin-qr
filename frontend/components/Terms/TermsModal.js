@@ -52,7 +52,7 @@ class TermsModal extends React.PureComponent {
                         </li>
                         <li>
                             <a
-                                href='https://github.com/josh-mcfarlin/crypto-qr'
+                                href='https://github.com/josh-mcfarlin/coin-qr'
                                 rel='noopener noreferrer'
                                 target='_blank'
                             >

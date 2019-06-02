@@ -1,17 +1,17 @@
 {
-  "name": "crypto-qr",
+  "name": "coin-qr",
   "description": "A tool to generate a single QR code to receive payments in multiple cryptocurrencies",
   "version": "1.0.0",
   "author": "Josh McFarlin",
   "license": "MIT",
   "private": false,
-  "homepage": "https://github.com/josh-mcfarlin/crypto-qr",
+  "homepage": "https://github.com/josh-mcfarlin/coin-qr",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/josh-mcfarlin/crypto-qr.git"
+    "url": "git+https://github.com/josh-mcfarlin/coin-qr.git"
   },
   "bugs": {
-    "url": "https://github.com/josh-mcfarlin/crypto-qr/issues"
+    "url": "https://github.com/josh-mcfarlin/coin-qr/issues"
   },
   "dependencies": {
     "@zeit/next-css": "^1.0.1",
