@@ -7,9 +7,11 @@ import withStyles, { ThemeProvider } from 'react-jss';
 import { Container } from 'shards-react';
 import MobileDetect from 'mobile-detect';
 import _ from 'lodash';
+import Cookies from 'universal-cookie';
 
 import PageContext from '../frontend/utils/pageContext';
 import NavBar from '../frontend/components/NavBar/NavBar';
+import TermsModal from '../frontend/components/Terms/TermsModal';
 import 'bootstrap-css-only';
 import 'shards-ui/dist/css/shards.min.css';
 import 'react-select/dist/react-select.css';
@@ -26,8 +28,26 @@ const styles = (theme) => ({
 });
 
 class AppContent extends React.PureComponent {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            termsOpen: true
+        };
+    }
+
+    closeModal = () => {
+        this.setState({
+            termsOpen: false
+        });
+    };
+
     render() {
         const { classes, Component, pageContext, pageProps, isMobile, userId } = this.props;
+        const { termsOpen } = this.state;
+
+        const cookies = new Cookies();
+        const termsCookie = cookies.get('acceptedTerms');
 
         return (
             <React.Fragment>
@@ -36,6 +56,12 @@ class AppContent extends React.PureComponent {
                     className={classes.content}
                     fluid
                 >
+                    {(!_.isNil(termsCookie) && termsCookie === 'false') && (
+                        <TermsModal
+                            isOpen={termsOpen}
+                            toggleModal={this.closeModal}
+                        />
+                    )}
                     <Component
                         pageContext={pageContext}
                         isMobile={isMobile}
