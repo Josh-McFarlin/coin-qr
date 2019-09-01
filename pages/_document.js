@@ -48,7 +48,8 @@ class MyDocument extends Document {
                     <meta charSet='utf-8' />
                     <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no' />
                     <meta name='theme-color' content={pageContext ? pageContext.theme.palette.primary.main : null} />
-                    <meta name='description' content='A tool to manage communal kitchen cleaning.' />
+                    <meta name='description' content='Generate a single QR code to receive payments in multiple cryptocurrencies.' />
+                    <meta name='keywords' content='cryptocurrency,bitcoin,ethereum,qr' />
                     <link rel='apple-touch-icon' sizes='180x180' href='/static/favicons/apple-touch-icon.png' />
                     <link rel='icon' type='image/png' sizes='32x32' href='/static/favicons/favicon-32x32.png' />
                     <link rel='icon' type='image/png' sizes='16x16' href='/static/favicons/favicon-16x16.png' />

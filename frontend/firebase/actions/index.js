@@ -1,3 +1,3 @@
 export * from './auth';
-export * from './jobs';
-export * from './people';
+export * from './pages';
+export * from './profiles';

@@ -1,5 +1,3 @@
-.next/
-out/
-node_modules/
-.idea_modules/
-.idea/
+.next
+out
+/screenshots/

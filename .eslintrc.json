@@ -39,8 +39,6 @@
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     "arrow-parens": ["error", "always"],
     "implicit-arrow-linebreak": "off",
-    "no-unused-vars": ["error", { "args": "none" }],
-    "import/prefer-default-export": "off",
-    "no-underscore-dangle": "off"
+    "no-unused-vars": ["error", { "args": "none" }]
   }
 }
