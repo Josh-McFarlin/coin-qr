@@ -171,4 +171,4 @@ modules.xml
 
 build/
 .next/
-/admin-credentials.json
+/serviceAccountKey.json

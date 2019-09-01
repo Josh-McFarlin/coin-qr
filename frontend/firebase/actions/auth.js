@@ -1,71 +1,46 @@
-import Cookies from 'universal-cookie';
+import fetch from 'isomorphic-unfetch';
 
 import firebase from '../index';
 import urls from '../../../utils/urls';
-import { createProfile } from './profiles';
+import { createPerson } from './people';
 
 
-export const registerNewUser = (email, password) =>
-    firebase.auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then((user) => {
-            const cookies = new Cookies();
-            const csrfToken = cookies.get('csrfToken');
+export const loginUser = () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
 
-            user.user.getIdToken()
-                .then((idToken) =>
-                    fetch('/sessionLogin', {
-                        method: 'post',
-                        mode: 'same-origin',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            idToken,
-                            csrfToken
-                        })
-                    }))
-                .then(() => firebase.auth().signOut())
-                .then(() => createProfile())
-                .then(() => {
-                    try {
-                        window.location.assign(urls.profile.view(user.user.uid));
-                    } catch (error) {
-                        window.location.assign(urls.home());
-                    }
-                });
-        });
+    firebase.auth().signInWithPopup(provider).then(async (result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        // const token = result.credential.accessToken;
 
-export const loginUser = (email, password) =>
-    firebase.auth()
-        .signInWithEmailAndPassword(email, password)
-        .then((user) => {
-            const cookies = new Cookies();
-            const csrfToken = cookies.get('csrfToken');
+        const { user, additionalUserInfo } = result;
 
-            user.user.getIdToken()
-                .then((idToken) =>
-                    fetch('/sessionLogin', {
-                        method: 'post',
-                        mode: 'same-origin',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            idToken,
-                            csrfToken
-                        })
-                    }))
-                .then(() => firebase.auth().signOut())
-                .then(() => {
-                    window.location.assign(urls.home());
-                });
-        });
+        await user.getIdToken()
+            .then((idToken) =>
+                fetch(urls.auth.sessionLogin, {
+                    method: 'post',
+                    mode: 'same-origin',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        idToken
+                    })
+                }))
+            .then(() => firebase.auth().signOut())
+            .then(async () => {
+                if (additionalUserInfo.isNewUser) {
+                    await createPerson(user);
+                }
+            })
+            .then(() => {
+                window.location.assign(urls.home);
+            });
+    });
+};
 
 export const signOut = () =>
-    fetch('/sessionLogout', {
+    fetch(urls.auth.sessionLogout, {
         method: 'post',
         mode: 'same-origin',
         credentials: 'include',
@@ -74,6 +49,17 @@ export const signOut = () =>
         }
     });
 
-export const resetPassword = (email) =>
-    firebase.auth()
-        .sendPasswordResetEmail(email);
+export const getCurrentUser = (session) =>
+    fetch(urls.base + urls.auth.getCurrentUser, {
+        method: 'post',
+        mode: 'same-origin',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            session
+        })
+    })
+        .then((response) => response.json())
+        .then((json) => json.user);

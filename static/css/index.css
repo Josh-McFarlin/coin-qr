@@ -30,3 +30,7 @@ picture {
 .row .row {
     padding-bottom: 16px;
 }
+
+.row .row:last-of-type {
+    padding-bottom: 0;
+}
