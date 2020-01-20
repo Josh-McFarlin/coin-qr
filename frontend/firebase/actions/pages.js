@@ -1,5 +1,43 @@
+import isString from 'lodash/isString';
 import firebase from '../index';
 
+
+export const getPage = (pageId) =>
+    firebase.firestore()
+        .collection('pages')
+        .doc(pageId)
+        .get()
+        .then((page) => page.data());
+
+export const getRecent = (userId) => {
+    let pages = firebase.firestore().collection('pages');
+
+    if (isString(userId)) {
+        pages = pages.where('owner', '==', userId);
+    }
+
+    return pages
+        .orderBy('modified', 'desc')
+        .limit(25)
+        .get()
+        .then((snapshot) => {
+            const recentPages = [];
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+
+                data.created = data.created.toDate();
+                data.modified = data.modified.toDate();
+
+                recentPages.push({
+                    ...data,
+                    id: doc.id
+                });
+            });
+
+            return recentPages;
+        });
+};
 
 export const addPage = (data) => {
     const { currentUser } = firebase.auth();

@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import App, { Container as AppContainer } from 'next/app';
 import Head from 'next/head';
-import JssProvider from 'react-jss/lib/JssProvider';
-import withStyles, { ThemeProvider } from 'react-jss';
+import JssProvider from 'react-jss/dist/react-jss';
 import { Container } from 'shards-react';
 import MobileDetect from 'mobile-detect';
 import _ from 'lodash';
@@ -13,7 +12,6 @@ import NavBar from '../frontend/components/NavBar/NavBar';
 import TermsModal from '../frontend/components/Terms/TermsModal';
 import 'bootstrap-css-only';
 import 'shards-ui/dist/css/shards.min.css';
-import 'react-select/dist/react-select.css';
 import 'react-virtualized/styles.css';
 import 'react-virtualized-select/styles.css';
 import '../public/static/css/index.css';
@@ -43,7 +41,7 @@ class AppContent extends React.PureComponent {
     };
 
     render() {
-        const { classes, Component, pageContext, pageProps, isMobile, userId } = this.props;
+        const { classes, Component, pageContext, pageProps, isMobile } = this.props;
         const { termsOpen } = this.state;
 
         const cookies = new Cookies();
@@ -51,7 +49,7 @@ class AppContent extends React.PureComponent {
 
         return (
             <React.Fragment>
-                <NavBar userId={userId} />
+                <NavBar />
                 <Container
                     className={classes.content}
                     fluid
@@ -78,20 +76,11 @@ AppContent.propTypes = {
     Component: PropTypes.any.isRequired,
     pageContext: PropTypes.object.isRequired,
     pageProps: PropTypes.object.isRequired,
-    isMobile: PropTypes.bool.isRequired,
-    userId: PropTypes.string
+    isMobile: PropTypes.bool.isRequired
 };
-
-AppContent.defaultProps = {
-    userId: null
-};
-
-const StyledContent = withStyles(styles)(AppContent);
 
 export default class MyApp extends App {
     static async getInitialProps({ Component, ctx }) {
-        const locals = _.get(ctx, 'res.locals', {});
-
         let pageProps = {};
 
         if (Component.getInitialProps) {
@@ -104,7 +93,6 @@ export default class MyApp extends App {
         return {
             pageProps,
             isMobile: md.mobile() != null,
-            userId: locals.userId
         };
     }
 
@@ -123,7 +111,7 @@ export default class MyApp extends App {
     }
 
     render() {
-        const { Component, pageProps, isMobile, userId } = this.props;
+        const { Component, pageProps, isMobile } = this.props;
 
         return (
             <AppContainer>
@@ -134,15 +122,12 @@ export default class MyApp extends App {
                     registry={this.pageContext.sheetsRegistry}
                     generateClassName={this.pageContext.generateClassName}
                 >
-                    <ThemeProvider theme={this.pageContext.theme}>
-                        <StyledContent
-                            Component={Component}
-                            pageContext={this.pageContext}
-                            pageProps={pageProps}
-                            isMobile={isMobile}
-                            userId={userId}
-                        />
-                    </ThemeProvider>
+                    <StyledContent
+                        Component={Component}
+                        pageContext={this.pageContext}
+                        pageProps={pageProps}
+                        isMobile={isMobile}
+                    />
                 </JssProvider>
             </AppContainer>
         );

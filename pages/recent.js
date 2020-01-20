@@ -1,11 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import withStyles from 'react-jss';
 import { Row, Col, Card, CardBody, CardHeader } from 'shards-react';
 import moment from 'moment';
-import { withRouter } from 'next/router';
-import _ from 'lodash';
-
+import { Router } from 'next/router';
+import { getRecent } from '../frontend/firebase/actions';
 import urls from '../utils/urls';
 
 
@@ -15,68 +12,56 @@ const styles = () => ({
     }
 });
 
-class RecentPage extends React.PureComponent {
-    static async getInitialProps({ query, res }) {
-        const locals = _.get(res, 'locals', {});
+const RecentPage = () => {
+    const [recentPages, setRecentPages] = React.useState([]);
 
-        return {
-            recentPages: locals.recentPages
-        };
-    }
+    React.useEffect(() => {
+        getRecent().then((recent) => setRecentPages(recent))
+    }, []);
 
-    render() {
-        const { classes, router, recentPages } = this.props;
-
-        return (
-            <Row>
-                <Col>
-                    <Card>
-                        <CardHeader className={classes.header}>
-                            Recent Pages
-                        </CardHeader>
-                        <CardBody>
-                            <div className='table-responsive'>
-                                <table className='table table-striped table-hover'>
-                                    <thead>
-                                        <tr>
-                                            <th scope='col'>
-                                                Name
-                                            </th>
-                                            <th scope='col'>
-                                                Last Updated
-                                            </th>
+    return (
+        <Row>
+            <Col>
+                <Card>
+                    <CardHeader className={classes.header}>
+                        Recent Pages
+                    </CardHeader>
+                    <CardBody>
+                        <div className='table-responsive'>
+                            <table className='table table-striped table-hover'>
+                                <thead>
+                                    <tr>
+                                        <th scope='col'>
+                                            Name
+                                        </th>
+                                        <th scope='col'>
+                                            Last Updated
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {recentPages.map((page) => (
+                                        <tr
+                                            className={classes.row}
+                                            key={page.id}
+                                            onClick={() => Router.push(urls.qr.view(page.postId))}
+                                        >
+                                            <td>
+                                                {page.data.title}
+                                            </td>
+                                            <td>
+                                                {moment(page.modified).fromNow()}
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {recentPages.map((page) => (
-                                            <tr
-                                                className={classes.row}
-                                                key={page.id}
-                                                onClick={() => router.push(urls.qr.view(page.postId))}
-                                            >
-                                                <td>
-                                                    {page.data.title}
-                                                </td>
-                                                <td>
-                                                    {moment(page.modified).fromNow()}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </CardBody>
-                    </Card>
-                </Col>
-            </Row>
-        );
-    }
-}
-
-RecentPage.propTypes = {
-    classes: PropTypes.object.isRequired,
-    router: PropTypes.object.isRequired,
-    recentPages: PropTypes.array.isRequired
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </CardBody>
+                </Card>
+            </Col>
+        </Row>
+    );
 };
 
-export default withRouter(withStyles(styles)(RecentPage));
+export default RecentPage;
