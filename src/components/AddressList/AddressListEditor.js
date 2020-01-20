@@ -305,7 +305,6 @@ class AddressListEditor extends React.PureComponent {
 }
 
 AddressListEditor.propTypes = {
-    classes: PropTypes.object.isRequired,
     addresses: PropTypes.arrayOf(
         PropTypes.shape({
             coin: PropTypes.string.isRequired,
