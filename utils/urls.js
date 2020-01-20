@@ -3,7 +3,7 @@ module.exports = {
     home: () => '/',
     auth: () => '/login',
     recent: () => '/recent',
-    donate: () => '/donate',
+    donate: () => '/qr/VlWXqvylnduFa8DvltdP',
     qr: {
         create: () => '/create',
         view: (id) => `/qr/${id}`,

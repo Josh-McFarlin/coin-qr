@@ -1,20 +1,13 @@
 import React from 'react';
 import { Row, Col, Card, CardBody, CardHeader } from 'shards-react';
 import moment from 'moment';
-import { Router } from 'next/router';
+import { useRouter } from 'next/router';
 import { getRecent } from '../src/firebase/actions';
 import urls from '../utils/urls';
 
 
-const styles = () => ({
-    row: {
-        cursor: 'pointer'
-    }
-});
-
-const classes = {};
-
 const RecentPage = () => {
+    const router = useRouter();
     const [recentPages, setRecentPages] = React.useState([]);
 
     React.useEffect(() => {
@@ -25,7 +18,7 @@ const RecentPage = () => {
         <Row>
             <Col>
                 <Card>
-                    <CardHeader className={classes.header}>
+                    <CardHeader>
                         Recent Pages
                     </CardHeader>
                     <CardBody>
@@ -44,9 +37,11 @@ const RecentPage = () => {
                                 <tbody>
                                     {recentPages.map((page) => (
                                         <tr
-                                            className={classes.row}
                                             key={page.id}
-                                            onClick={() => Router.push(urls.qr.view(page.postId))}
+                                            onClick={() => router.push(urls.qr.view(page.id))}
+                                            style={{
+                                                cursor: 'pointer'
+                                            }}
                                         >
                                             <td>
                                                 {page.data.title}

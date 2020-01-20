@@ -58,9 +58,6 @@ const ViewPage = () => {
     const { pageId } = query;
 
     React.useEffect(() => {
-        getPage(pageId)
-            .then((newPage) => setPage(newPage));
-
         firebase.auth()
             .onAuthStateChanged((user) => {
                 if (user) {
@@ -72,6 +69,13 @@ const ViewPage = () => {
                 setUserId(null);
             });
     }, []);
+
+    React.useEffect(() => {
+        if (pageId != null) {
+            getPage(pageId)
+                .then((newPage) => setPage(newPage));
+        }
+    }, [pageId]);
 
     const toggleModal = () => {
         setModalOpen((prevState) => !prevState);
