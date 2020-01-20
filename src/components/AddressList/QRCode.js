@@ -1,7 +1,6 @@
 /* eslint-disable import/no-dynamic-require */
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'react-jss';
 import { Button, Modal, ModalBody, ModalHeader, ModalFooter } from 'shards-react';
 import QRImg from 'qrcode.react';
 import _ from 'lodash';

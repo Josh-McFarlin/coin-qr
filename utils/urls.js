@@ -10,7 +10,7 @@ module.exports = {
         edit: (id) => `/qr/${id}/edit`
     },
     myProfile: {
-        edit: () => '/myprofile/edit'
+        edit: () => '/editProfile'
     },
     profile: {
         view: (id) => `/profile/${id}`

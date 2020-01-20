@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'react-jss';
 import { withRouter } from 'next/router';
 import _ from 'lodash';
 import {
@@ -42,6 +41,8 @@ const styles = () => ({
         float: 'right'
     }
 });
+
+const classes = {};
 
 class EditProfilePage extends React.PureComponent {
     static async getInitialProps({ query, res }) {
@@ -104,7 +105,7 @@ class EditProfilePage extends React.PureComponent {
     };
 
     render() {
-        const { classes, error } = this.props;
+        const { error } = this.props;
         const { data, editError } = this.state;
 
         if (_.isObject(error)) {
@@ -209,7 +210,6 @@ class EditProfilePage extends React.PureComponent {
 }
 
 EditProfilePage.propTypes = {
-    classes: PropTypes.object.isRequired,
     profile: PropTypes.object.isRequired,
     router: PropTypes.object.isRequired,
     error: PropTypes.object
@@ -219,4 +219,4 @@ EditProfilePage.defaultProps = {
     error: undefined
 };
 
-export default withRouter(withStyles(styles)(EditProfilePage));
+export default EditProfilePage;

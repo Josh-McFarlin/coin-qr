@@ -183,7 +183,7 @@ class AddressListEditor extends React.PureComponent {
     };
 
     render() {
-        const { classes, className, addresses, error } = this.props;
+        const { className, addresses, error } = this.props;
         const { modalOpen, newAddress, newCoinType, newValid, validMessage } = this.state;
 
         return (
