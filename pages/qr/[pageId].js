@@ -58,7 +58,13 @@ const ViewPage = () => {
 
         firebase.auth()
             .onAuthStateChanged((user) => {
-                setUserId(user.uid);
+                if (user) {
+                    setUserId(user.uid);
+                } else {
+                    setUserId(null);
+                }
+            }, () => {
+                setUserId(null);
             });
     }, []);
 

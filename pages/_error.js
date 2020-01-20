@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'react-jss';
 
 
 const styles = (theme) => ({
@@ -31,44 +30,46 @@ const styles = (theme) => ({
     }
 });
 
-class NotFoundPage extends React.PureComponent {
-    render() {
-        const { classes, statusCode, statusMessage } = this.props;
+const classes = {};
 
-        return (
-            <div className={classes.container}>
-                <svg className={classes.svg}>
-                    <text
-                        x='50%'
-                        y='50%'
-                        alignmentBaseline='middle'
-                        dominantBaseline='middle'
-                        textAnchor='middle'
-                        preserveAspectRatio='xMinYMin'
-                        className={classes.textLine}
-                    >
-                        {statusCode}
-                    </text>
-                </svg>
-                {(statusMessage) && (
-                    <h3>
-                        {statusMessage}
-                    </h3>
-                )}
-            </div>
-        );
-    }
-}
+const ErrorPage = ({ statusCode, statusMessage }) => (
+    <div className={classes.container}>
+        <svg className={classes.svg}>
+            <text
+                x='50%'
+                y='50%'
+                alignmentBaseline='middle'
+                dominantBaseline='middle'
+                textAnchor='middle'
+                preserveAspectRatio='xMinYMin'
+                className={classes.textLine}
+            >
+                {statusCode}
+            </text>
+        </svg>
+        {(statusMessage) && (
+            <h3>
+                {statusMessage}
+            </h3>
+        )}
+    </div>
+);
 
-NotFoundPage.propTypes = {
-    classes: PropTypes.object.isRequired,
+ErrorPage.getInitialProps = ({ res, err }) => {
+    // eslint-disable-next-line no-nested-ternary
+    const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
+
+    return { statusCode };
+};
+
+ErrorPage.propTypes = {
     statusCode: PropTypes.number,
     statusMessage: PropTypes.string
 };
 
-NotFoundPage.defaultProps = {
+ErrorPage.defaultProps = {
     statusCode: 404,
     statusMessage: 'Page Not Found :('
 };
 
-export default withStyles(styles)(NotFoundPage);
+export default ErrorPage;

@@ -1,53 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import Document, { Head, Main, NextScript } from 'next/document';
-import { resetServerContext } from 'react-beautiful-dnd';
+import Document, { Html, Head, Main, NextScript } from 'next/document'
 
 
 class MyDocument extends Document {
-    static async getInitialProps(ctx) {
-        let pageContext;
-        const page = ctx.renderPage((Component) => {
-            const WrappedComponent = (props) => {
-            // eslint-disable-next-line react/destructuring-assignment,prefer-destructuring
-                pageContext = props.pageContext;
-                return <Component {...props} />;
-            };
-
-            WrappedComponent.propTypes = {
-                pageContext: PropTypes.object.isRequired
-            };
-
-            return WrappedComponent;
-        });
-
-        let css;
-        if (pageContext) {
-            css = pageContext.sheetsRegistry.toString();
-        }
-
-        resetServerContext();
-
-        return {
-            ...page,
-            pageContext,
-            styles: (
-                <React.Fragment>
-                    <style id='server-side-styles'>{css}</style>
-                </React.Fragment>
-            )
-        };
-    }
-
     render() {
-        const { pageContext } = this.props;
-
         return (
-            <html lang='en' dir='ltr'>
+            <Html lang='en' dir='ltr'>
                 <Head>
                     <meta charSet='utf-8' />
                     <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no' />
-                    <meta name='theme-color' content={pageContext ? pageContext.theme.palette.primary.main : null} />
                     <meta name='description' content='Generate a single QR code to receive payments in multiple cryptocurrencies.' />
                     <meta name='keywords' content='cryptocurrency,bitcoin,ethereum,qr' />
                     <link rel='apple-touch-icon' sizes='180x180' href='/favicons/apple-touch-icon.png' />
@@ -59,7 +20,7 @@ class MyDocument extends Document {
                     <Main />
                     <NextScript />
                 </body>
-            </html>
+            </Html>
         );
     }
 }

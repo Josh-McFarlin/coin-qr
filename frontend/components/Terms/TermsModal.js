@@ -7,16 +7,8 @@ import {
     ModalFooter,
     ModalHeader
 } from 'shards-react';
-import withStyles from 'react-jss';
 import Cookies from 'universal-cookie';
 
-
-const styles = () => ({
-    modalBody: {
-        maxHeight: '60vh',
-        overflow: 'auto'
-    }
-});
 
 class TermsModal extends React.PureComponent {
     setAcceptCookie = () => {
@@ -37,12 +29,17 @@ class TermsModal extends React.PureComponent {
     };
 
     render() {
-        const { classes, isOpen } = this.props;
+        const { isOpen } = this.props;
 
         return (
             <Modal open={isOpen} size='lg' toggle={() => {}}>
                 <ModalHeader>Security and Terms of Use</ModalHeader>
-                <ModalBody className={classes.modalBody}>
+                <ModalBody
+                    style={{
+                        maxHeight: '60vh',
+                        overflow: 'auto'
+                    }}
+                >
                     <h5>Security</h5>
                     <ul>
                         <li>
@@ -109,9 +106,8 @@ class TermsModal extends React.PureComponent {
 }
 
 TermsModal.propTypes = {
-    classes: PropTypes.object.isRequired,
     isOpen: PropTypes.bool.isRequired,
     toggleModal: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(TermsModal);
+export default TermsModal;

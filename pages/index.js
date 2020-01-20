@@ -13,6 +13,8 @@ const styles = () => ({
     }
 });
 
+const classes = {}
+
 const IndexPage = () => (
     <Row>
         <Col>
@@ -33,7 +35,7 @@ const IndexPage = () => (
                                     large size of QR codes makes this difficult.
                                 </li>
                                 <li>
-                                        Furthermore, a wallet owner may want to change a wallet address after distributing a QR Code.
+                                    Furthermore, a wallet owner may want to change a wallet address after distributing a QR Code.
                                 </li>
                             </ul>
 
