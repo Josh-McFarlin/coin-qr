@@ -1,40 +1,44 @@
-export const addPage = (data) =>
-    fetch('/firebase/addPage', {
-        method: 'post',
-        mode: 'same-origin',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            data
-        })
-    })
-        .then((response) => response.json());
+import firebase from '../index';
 
-export const updatePage = (data, id) =>
-    fetch('/firebase/updatePage', {
-        method: 'post',
-        mode: 'same-origin',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+
+export const addPage = (data) => {
+    const { currentUser } = firebase.auth();
+
+    if (currentUser == null) throw new Error('Not logged in!');
+
+    const docRef = firebase.firestore()
+        .collection('pages')
+        .doc();
+
+    const curDate = firebase.firestore.FieldValue.serverTimestamp();
+
+    const page = {
+        id: docRef.id,
+        owner: currentUser.uid,
+        created: curDate,
+        modified: curDate,
+        data
+    };
+
+    return docRef
+        .set(page)
+        .then(() => page);
+};
+
+export const updatePage = (pageId, data) => {
+    const modified = firebase.firestore.FieldValue.serverTimestamp();
+
+    return firebase.firestore()
+        .collection('pages')
+        .doc(pageId)
+        .update({
             data,
-            id
-        })
-    });
+            modified
+        });
+};
 
-export const deletePage = (id) =>
-    fetch('/firebase/deletePage', {
-        method: 'post',
-        mode: 'same-origin',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            id
-        })
-    });
+export const deletePage = (pageId) =>
+    firebase.firestore()
+        .collection('pages')
+        .doc(pageId)
+        .delete();

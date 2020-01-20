@@ -8,7 +8,6 @@ import { Container } from 'shards-react';
 import MobileDetect from 'mobile-detect';
 import _ from 'lodash';
 import Cookies from 'universal-cookie';
-
 import PageContext from '../frontend/utils/pageContext';
 import NavBar from '../frontend/components/NavBar/NavBar';
 import TermsModal from '../frontend/components/Terms/TermsModal';
@@ -17,6 +16,7 @@ import 'shards-ui/dist/css/shards.min.css';
 import 'react-select/dist/react-select.css';
 import 'react-virtualized/styles.css';
 import 'react-virtualized-select/styles.css';
+import '../public/static/css/index.css';
 
 
 const styles = (theme) => ({

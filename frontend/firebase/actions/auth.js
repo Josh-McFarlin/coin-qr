@@ -1,5 +1,4 @@
-import Cookies from 'universal-cookie';
-
+import Router from 'next/router';
 import firebase from '../index';
 import urls from '../../../utils/urls';
 import { createProfile } from './profiles';
@@ -8,71 +7,18 @@ import { createProfile } from './profiles';
 export const registerNewUser = (email, password) =>
     firebase.auth()
         .createUserWithEmailAndPassword(email, password)
-        .then((user) => {
-            const cookies = new Cookies();
-            const csrfToken = cookies.get('csrfToken');
-
-            user.user.getIdToken()
-                .then((idToken) =>
-                    fetch('/sessionLogin', {
-                        method: 'post',
-                        mode: 'same-origin',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            idToken,
-                            csrfToken
-                        })
-                    }))
-                .then(() => firebase.auth().signOut())
-                .then(() => createProfile())
-                .then(() => {
-                    try {
-                        window.location.assign(urls.profile.view(user.user.uid));
-                    } catch (error) {
-                        window.location.assign(urls.home());
-                    }
-                });
-        });
+        .then((resp) => createProfile(resp.user.uid))
+        .then(() => Router.push(urls.myProfile.edit()));
 
 export const loginUser = (email, password) =>
     firebase.auth()
         .signInWithEmailAndPassword(email, password)
-        .then((user) => {
-            const cookies = new Cookies();
-            const csrfToken = cookies.get('csrfToken');
-
-            user.user.getIdToken()
-                .then((idToken) =>
-                    fetch('/sessionLogin', {
-                        method: 'post',
-                        mode: 'same-origin',
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            idToken,
-                            csrfToken
-                        })
-                    }))
-                .then(() => firebase.auth().signOut())
-                .then(() => {
-                    window.location.assign(urls.home());
-                });
-        });
+        .then((resp) => Router.push(urls.profile.view(resp.user.uid)));
 
 export const signOut = () =>
-    fetch('/sessionLogout', {
-        method: 'post',
-        mode: 'same-origin',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+    firebase.auth()
+        .signOut()
+        .then(() => Router.push(urls.home()));
 
 export const resetPassword = (email) =>
     firebase.auth()

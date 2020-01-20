@@ -10,7 +10,7 @@ import {
 
 import Error from './_error';
 import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
-import noProfilePic from '../static/images/noProfilePic.png';
+import noProfilePic from '../public/static/images/noProfilePic.png';
 import { updateProfile } from '../frontend/firebase/actions';
 import urls from '../utils/urls';
 

@@ -50,11 +50,10 @@ class MyDocument extends Document {
                     <meta name='theme-color' content={pageContext ? pageContext.theme.palette.primary.main : null} />
                     <meta name='description' content='Generate a single QR code to receive payments in multiple cryptocurrencies.' />
                     <meta name='keywords' content='cryptocurrency,bitcoin,ethereum,qr' />
-                    <link rel='apple-touch-icon' sizes='180x180' href='/static/favicons/apple-touch-icon.png' />
-                    <link rel='icon' type='image/png' sizes='32x32' href='/static/favicons/favicon-32x32.png' />
-                    <link rel='icon' type='image/png' sizes='16x16' href='/static/favicons/favicon-16x16.png' />
-                    <link rel='manifest' href='/static/favicons/site.webmanifest' />
-                    <link rel='stylesheet' type='text/css' href='/static/css/index.css' />
+                    <link rel='apple-touch-icon' sizes='180x180' href='/favicons/apple-touch-icon.png' />
+                    <link rel='icon' type='image/png' sizes='32x32' href='/favicons/favicon-32x32.png' />
+                    <link rel='icon' type='image/png' sizes='16x16' href='/favicons/favicon-16x16.png' />
+                    <link rel='manifest' href='/favicons/site.webmanifest' />
                 </Head>
                 <body>
                     <Main />

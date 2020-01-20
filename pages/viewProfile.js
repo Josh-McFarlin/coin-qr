@@ -16,7 +16,7 @@ import classNames from 'classnames';
 import Error from './_error';
 import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
 import PageSection from '../frontend/components/PageSection/PageSection';
-import noProfilePic from '../static/images/noProfilePic.png';
+import noProfilePic from '../public/static/images/noProfilePic.png';
 import PageQRCode from '../frontend/components/AddressList/QRCode';
 import urls from '../utils/urls';
 
