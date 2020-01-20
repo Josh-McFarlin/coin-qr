@@ -4,10 +4,10 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 import isString from 'lodash/isString';
 import { Card, CardHeader, CardBody, Row, Col, Button, ButtonGroup } from 'shards-react';
-import firebase from '../../frontend/firebase';
-import { getPage } from '../../frontend/firebase/actions/pages';
-import AddressQRCode from '../../frontend/components/AddressList/QRCode';
-import AddressListViewer from '../../frontend/components/AddressList/AddressListViewer';
+import firebase from '../../src/firebase';
+import { getPage } from '../../src/firebase/actions/pages';
+import AddressQRCode from '../../src/components/AddressList/QRCode';
+import AddressListViewer from '../../src/components/AddressList/AddressListViewer';
 import urls from '../../utils/urls';
 
 

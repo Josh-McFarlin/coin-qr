@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'react-jss';
 import {
     Alert, Collapse, Card, CardHeader, CardBody, ListGroup, Button, FormFeedback,
     Modal, ModalBody, ModalHeader, ModalFooter, Form, FormInput, FormGroup
@@ -29,6 +28,8 @@ const styles = (theme) => ({
         overflowY: 'auto'
     }
 });
+
+const classes = {};
 
 const reorder = (list, startIndex, endIndex) => {
     const result = _.cloneDeep(list);
@@ -321,4 +322,4 @@ AddressListEditor.defaultProps = {
     className: null
 };
 
-export default withStyles(styles)(AddressListEditor);
+export default AddressListEditor;

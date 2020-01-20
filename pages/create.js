@@ -15,10 +15,10 @@ import {
     Form,
     FormGroup, FormInput, FormFeedback, FormTextarea, CardFooter
 } from 'shards-react';
-import { addPage, getPage } from '../frontend/firebase/actions/pages';
-import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
+import { addPage, getPage } from '../src/firebase/actions/pages';
+import AddressListEditor from '../src/components/AddressList/AddressListEditor';
 import urls from '../utils/urls';
-import firebase from '../frontend/firebase';
+import firebase from '../src/firebase';
 
 
 const styles = (theme) => ({

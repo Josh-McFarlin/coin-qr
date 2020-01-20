@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col, Card, CardBody, CardHeader } from 'shards-react';
 import moment from 'moment';
 import { Router } from 'next/router';
-import { getRecent } from '../frontend/firebase/actions';
+import { getRecent } from '../src/firebase/actions';
 import urls from '../utils/urls';
 
 
@@ -12,11 +12,13 @@ const styles = () => ({
     }
 });
 
+const classes = {};
+
 const RecentPage = () => {
     const [recentPages, setRecentPages] = React.useState([]);
 
     React.useEffect(() => {
-        getRecent().then((recent) => setRecentPages(recent))
+        getRecent().then((recent) => setRecentPages(recent));
     }, []);
 
     return (

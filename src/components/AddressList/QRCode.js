@@ -34,7 +34,9 @@ const styles = (theme) => ({
     }
 });
 
-const QRCode = ({ classes, modalOpen, modalInfo, closeModal }) => {
+const classes = {};
+
+const QRCode = ({ modalOpen, modalInfo, closeModal }) => {
     if (_.isNil(modalInfo)) return null;
 
     const { coinType, address } = modalInfo;
@@ -87,7 +89,6 @@ const QRCode = ({ classes, modalOpen, modalInfo, closeModal }) => {
 };
 
 QRCode.propTypes = {
-    classes: PropTypes.object.isRequired,
     modalOpen: PropTypes.bool.isRequired,
     modalInfo: PropTypes.shape({
         coin: PropTypes.string,
@@ -100,4 +101,4 @@ QRCode.defaultProps = {
     modalInfo: null
 };
 
-export default withStyles(styles)(QRCode);
+export default QRCode;

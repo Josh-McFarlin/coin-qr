@@ -1,14 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import withStyles from 'react-jss';
 import _ from 'lodash';
 import {
     Collapse, Alert, Button, Form, FormGroup, InputGroup, InputGroupAddon,
     InputGroupText, FormInput, Card, CardHeader, CardBody, CardFooter
 } from 'shards-react';
 
-import { loginUser, registerNewUser, resetPassword } from '../frontend/firebase/actions';
-import TermsModal from '../frontend/components/Terms/TermsModal';
+import { loginUser, registerNewUser, resetPassword } from '../src/firebase/actions';
+import TermsModal from '../src/components/Terms/TermsModal';
 
 
 const styles = () => ({
@@ -26,6 +24,8 @@ const styles = () => ({
         cursor: 'pointer'
     }
 });
+
+const classes = {};
 
 class AuthPage extends React.PureComponent {
     constructor(props) {
@@ -141,7 +141,6 @@ class AuthPage extends React.PureComponent {
     };
 
     render() {
-        const { classes } = this.props;
         const { email, password, error, isRegistering, success, termsOpen } = this.state;
 
         return (
@@ -234,8 +233,4 @@ class AuthPage extends React.PureComponent {
     }
 }
 
-AuthPage.propTypes = {
-    classes: PropTypes.object.isRequired
-};
-
-export default withStyles(styles)(AuthPage);
+export default AuthPage;

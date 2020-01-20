@@ -2,7 +2,7 @@ import isNil from 'lodash/isNil';
 import firebase from '../index';
 
 
-const fetchProfile = (uid) =>
+export const getProfile = (uid) =>
     firebase.firestore()
         .collection('profiles')
         .doc(uid)

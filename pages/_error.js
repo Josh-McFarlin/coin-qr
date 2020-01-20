@@ -55,13 +55,6 @@ const ErrorPage = ({ statusCode, statusMessage }) => (
     </div>
 );
 
-ErrorPage.getInitialProps = ({ res, err }) => {
-    // eslint-disable-next-line no-nested-ternary
-    const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
-
-    return { statusCode };
-};
-
 ErrorPage.propTypes = {
     statusCode: PropTypes.number,
     statusMessage: PropTypes.string

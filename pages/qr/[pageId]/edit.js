@@ -8,9 +8,9 @@ import {
     Form, FormGroup, FormInput, FormTextarea, FormFeedback, Alert
 } from 'shards-react';
 import ErrorPage from '../../_error';
-import firebase from '../../../frontend/firebase';
-import { getPage, updatePage, deletePage } from '../../../frontend/firebase/actions/pages';
-import AddressListEditor from '../../../frontend/components/AddressList/AddressListEditor';
+import firebase from '../../../src/firebase';
+import { getPage, updatePage, deletePage } from '../../../src/firebase/actions/pages';
+import AddressListEditor from '../../../src/components/AddressList/AddressListEditor';
 import urls from '../../../utils/urls';
 
 

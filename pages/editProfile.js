@@ -9,9 +9,9 @@ import {
 } from 'shards-react';
 
 import Error from './_error';
-import AddressListEditor from '../frontend/components/AddressList/AddressListEditor';
+import AddressListEditor from '../src/components/AddressList/AddressListEditor';
 import noProfilePic from '../public/static/images/noProfilePic.png';
-import { updateProfile } from '../frontend/firebase/actions';
+import { updateProfile } from '../src/firebase/actions';
 import urls from '../utils/urls';
 
 

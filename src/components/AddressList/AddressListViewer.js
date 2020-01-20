@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'react-jss';
 import { Card, CardHeader, CardBody, ListGroup } from 'shards-react';
 import _ from 'lodash';
 
@@ -29,6 +28,8 @@ const styles = (theme) => ({
     }
 });
 
+const classes = {};
+
 class AddressListViewer extends React.PureComponent {
     constructor(props) {
         super(props);
@@ -53,7 +54,7 @@ class AddressListViewer extends React.PureComponent {
     };
 
     render() {
-        const { classes, className, addresses } = this.props;
+        const { className, addresses } = this.props;
         const { modalOpen, modalInfo } = this.state;
 
         return (
@@ -90,7 +91,6 @@ class AddressListViewer extends React.PureComponent {
 }
 
 AddressListViewer.propTypes = {
-    classes: PropTypes.object.isRequired,
     className: PropTypes.string,
     addresses: PropTypes.arrayOf(PropTypes.shape({
         coin: PropTypes.string.isRequired,
@@ -103,4 +103,4 @@ AddressListViewer.defaultProps = {
     addresses: null
 };
 
-export default withStyles(styles)(AddressListViewer);
+export default AddressListViewer;

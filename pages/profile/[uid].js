@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import withStyles from 'react-jss';
+import { useRouter } from 'next/router';
 import _ from 'lodash';
 import {
     Card,
@@ -12,13 +11,15 @@ import {
     Button
 } from 'shards-react';
 import classNames from 'classnames';
-
 import Error from '../_error';
-import AddressListViewer from '../../frontend/components/AddressList/AddressListViewer';
-import PageSection from '../../frontend/components/PageSection/PageSection';
+import AddressListViewer from '../../src/components/AddressList/AddressListViewer';
+import PageSection from '../../src/components/PageSection/PageSection';
 import noProfilePic from '../../public/static/images/noProfilePic.png';
-import PageQRCode from '../../frontend/components/AddressList/QRCode';
+import PageQRCode from '../../src/components/AddressList/QRCode';
 import urls from '../../utils/urls';
+import { getProfile } from '../../src/firebase/actions/profiles';
+import { getRecent } from '../../src/firebase/actions/pages';
+import firebase from '../../src/firebase';
 
 
 const styles = () => ({
@@ -69,208 +70,208 @@ const styles = () => ({
     }
 });
 
-class ViewProfilePage extends React.PureComponent {
-    static async getInitialProps({ query, res }) {
-        const { error, profile, recentPages, userId } = _.get(res, 'locals', {});
+const classes = {};
 
-        return {
-            error,
-            profile,
-            recentPages,
-            userId
-        };
-    }
+const ViewProfilePage = () => {
+    const { query } = useRouter();
+    const [modalOpen, setModalOpen] = React.useState(false);
+    const [userId, setUserId] = React.useState(null);
+    const [profile, setProfile] = React.useState(null);
+    const [recentPages, setRecentPages] = React.useState([]);
+    const [error, setError] = React.useState(null);
 
-    constructor(props) {
-        super(props);
+    React.useEffect(() => {
+        firebase.auth()
+            .onAuthStateChanged((user) => {
+                if (user) {
+                    setUserId(user.uid);
+                } else {
+                    setUserId(null);
+                }
+            }, () => {
+                setUserId(null);
+            });
+    }, []);
 
-        this.state = {
-            modalOpen: false
-        };
-    }
+    React.useEffect(() => {
+        const { uid } = query;
 
-    toggleModal = () => {
-        this.setState((prevState) => ({
-            modalOpen: !prevState.modalOpen
-        }));
-    };
+        if (uid != null) {
+            getProfile(uid)
+                .then((prof) => setProfile(prof))
+                .catch(() => setError({
+                    statusCode: 404,
+                    message: 'Unable to get profile!'
+                }));
 
-    render() {
-        const { classes, error, profile, recentPages, isMobile, userId } = this.props;
-        const { modalOpen } = this.state;
-
-        if (_.isObject(error)) {
-            return (
-                <Error
-                    statusCode={error.statusCode}
-                    statusMessage={error.message}
-                />
-            );
+            getRecent(uid)
+                .then((recent) => setRecentPages(recent))
+                .catch(() => setError({
+                    statusCode: 404,
+                    message: 'Unable to get recent!'
+                }));
         }
+    }, [query]);
 
-        const thisUrl = `${urls.base}${urls.profile.view(profile.profileId)}`;
+    const toggleModal = () => setModalOpen((prevState) => !prevState);
 
-        const isOwner =
-            _.has(profile, 'userId')
-            && _.isString(userId)
-            && profile.userId === userId;
-
-        const pictureSrc =
-            _.has(profile, 'data.picture') && !_.isEmpty(profile.data.picture) ?
-                profile.data.picture : noProfilePic;
-
-        const profileSection = (
-            <Card>
-                <CardHeader className={classes.header}>
-                    Profile
-                </CardHeader>
-                <CardBody>
-                    <Row className={classes.rowNoPadding}>
-                        <Col sm={2}>
-                            <Row>
-                                <Col className={classes.profileName}>
-                                    <b>
-                                        {_.get(profile, 'data.name')}
-                                    </b>
-                                </Col>
-                            </Row>
-                            <Row className={classes.rowNoPadding}>
-                                <Col className={classes.profileCol}>
-                                    <img
-                                        className={classes.profilePicture}
-                                        src={pictureSrc}
-                                        alt='Profile'
-                                    />
-                                </Col>
-                            </Row>
-                        </Col>
-                        <Col sm={10} className={classes.flexColumn}>
-                            <Row className={classes.flexFill}>
-                                {_.get(profile, 'data.bio')}
-                            </Row>
-                            <Row className={classes.rowNoPadding}>
-                                <div className={classes.buttonHolder}>
-                                    {isOwner && (
-                                        <Button
-                                            className='mr-3'
-                                            theme='primary'
-                                            href={urls.myProfile.edit()}
-                                        >
-                                            Edit Profile
-                                        </Button>
-                                    )}
-                                    <Button
-                                        theme='primary'
-                                        onClick={this.toggleModal}
-                                        className={classes.qrButton}
-                                    >
-                                        View QR
-                                    </Button>
-                                    <PageQRCode
-                                        modalOpen={modalOpen}
-                                        modalInfo={{
-                                            address: thisUrl,
-                                            coinType: 'Page'
-                                        }}
-                                        closeModal={this.toggleModal}
-                                    />
-                                </div>
-                            </Row>
-                        </Col>
-                    </Row>
-                </CardBody>
-            </Card>
-        );
-
-        const addressSection = (
-            <AddressListViewer
-                className={classes.fullHeight}
-                addresses={_.get(profile, 'data.addresses', [])}
+    if (_.isObject(error)) {
+        return (
+            <Error
+                statusCode={error.statusCode}
+                statusMessage={error.message}
             />
         );
+    }
 
-        const recentSection = (
-            <Card className={classes.fullHeight}>
-                <CardHeader className={classes.header}>
-                    Recent Pages
-                </CardHeader>
-                <CardBody className={classes.scrollBody}>
-                    <ListGroup>
-                        {_.map(recentPages, (page, index) => (
-                            <PageSection
-                                key={_.get(page, 'data.title', index)}
-                                page={page}
-                            />
-                        ))}
-                    </ListGroup>
-                </CardBody>
-            </Card>
-        );
+    const thisUrl = `${urls.base}${urls.profile.view(userId)}`;
 
-        if (isMobile) {
-            return (
-                <Row>
-                    <Col>
+    const isOwner =
+        _.has(profile, 'userId')
+        && _.isString(userId)
+        && profile.userId === userId;
+
+    const pictureSrc =
+        _.has(profile, 'data.picture') && !_.isEmpty(profile.data.picture) ?
+            profile.data.picture : noProfilePic;
+
+    const profileSection = (
+        <Card>
+            <CardHeader className={classes.header}>
+                Profile
+            </CardHeader>
+            <CardBody>
+                <Row className={classes.rowNoPadding}>
+                    <Col sm={2}>
                         <Row>
-                            <Col>
-                                {profileSection}
+                            <Col className={classes.profileName}>
+                                <b>
+                                    {_.get(profile, 'data.name')}
+                                </b>
                             </Col>
                         </Row>
-                        <Row>
-                            <Col>
-                                {addressSection}
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                {recentSection}
+                        <Row className={classes.rowNoPadding}>
+                            <Col className={classes.profileCol}>
+                                <img
+                                    className={classes.profilePicture}
+                                    src={pictureSrc}
+                                    alt='Profile'
+                                />
                             </Col>
                         </Row>
                     </Col>
+                    <Col sm={10} className={classes.flexColumn}>
+                        <Row className={classes.flexFill}>
+                            {_.get(profile, 'data.bio')}
+                        </Row>
+                        <Row className={classes.rowNoPadding}>
+                            <div className={classes.buttonHolder}>
+                                {isOwner && (
+                                    <Button
+                                        className='mr-3'
+                                        theme='primary'
+                                        href={urls.myProfile.edit()}
+                                    >
+                                        Edit Profile
+                                    </Button>
+                                )}
+                                <Button
+                                    theme='primary'
+                                    onClick={toggleModal}
+                                    className={classes.qrButton}
+                                >
+                                    View QR
+                                </Button>
+                                <PageQRCode
+                                    modalOpen={modalOpen}
+                                    modalInfo={{
+                                        address: thisUrl,
+                                        coinType: 'Page'
+                                    }}
+                                    closeModal={toggleModal}
+                                />
+                            </div>
+                        </Row>
+                    </Col>
                 </Row>
-            );
-        }
+            </CardBody>
+        </Card>
+    );
 
+    const addressSection = (
+        <AddressListViewer
+            className={classes.fullHeight}
+            addresses={_.get(profile, 'data.addresses', [])}
+        />
+    );
+
+    const recentSection = (
+        <Card className={classes.fullHeight}>
+            <CardHeader className={classes.header}>
+                Recent Pages
+            </CardHeader>
+            <CardBody className={classes.scrollBody}>
+                <ListGroup>
+                    {_.map(recentPages, (page, index) => (
+                        <PageSection
+                            key={_.get(page, 'data.title', index)}
+                            page={page}
+                        />
+                    ))}
+                </ListGroup>
+            </CardBody>
+        </Card>
+    );
+
+    if ('mob' === 0) {
         return (
-            <React.Fragment>
-                <Row className={classes.fullHeight}>
-                    <Col sm={8} className={classNames(classes.fullHeight, classes.flexColumn)}>
-                        <Row>
-                            <Col>
-                                {profileSection}
-                            </Col>
-                        </Row>
-                        <Row className={classes.flexFill}>
-                            <Col>
-                                {addressSection}
-                            </Col>
-                        </Row>
-                    </Col>
-                    <Col sm={4} className={classNames(classes.fullHeight, classes.flexColumn, classes.noLeftPadding)}>
-                        <Row className={classes.flexFill}>
-                            <Col className={classes.fullHeight}>
-                                {recentSection}
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-            </React.Fragment>
+            <Row>
+                <Col>
+                    <Row>
+                        <Col>
+                            {profileSection}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            {addressSection}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            {recentSection}
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
         );
     }
-}
 
-ViewProfilePage.propTypes = {
-    classes: PropTypes.object.isRequired,
-    profile: PropTypes.object.isRequired,
-    recentPages: PropTypes.array.isRequired,
-    isMobile: PropTypes.bool.isRequired,
-    error: PropTypes.object,
-    userId: PropTypes.string
+    return (
+        <React.Fragment>
+            <Row className={classes.fullHeight}>
+                <Col sm={8} className={classNames(classes.fullHeight, classes.flexColumn)}>
+                    <Row>
+                        <Col>
+                            {profileSection}
+                        </Col>
+                    </Row>
+                    <Row className={classes.flexFill}>
+                        <Col>
+                            {addressSection}
+                        </Col>
+                    </Row>
+                </Col>
+                <Col sm={4} className={classNames(classes.fullHeight, classes.flexColumn, classes.noLeftPadding)}>
+                    <Row className={classes.flexFill}>
+                        <Col className={classes.fullHeight}>
+                            {recentSection}
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
+        </React.Fragment>
+    );
 };
 
-ViewProfilePage.defaultProps = {
-    error: undefined,
-    userId: null
-};
-
-export default withStyles(styles)(ViewProfilePage);
+export default ViewProfilePage;
