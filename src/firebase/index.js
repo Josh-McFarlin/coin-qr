@@ -17,7 +17,7 @@ const config = {
 if (!firebase.apps.length) {
     firebase.initializeApp(config);
 
-    if (window != null) firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    if (process.browser) firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 }
 
 export default firebase;
