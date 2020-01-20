@@ -267,4 +267,4 @@ EditPage.defaultProps = {
     page: null
 };
 
-export default withRouter(withStyles(styles)(EditPage));
+export default withStyles(styles)(EditPage);

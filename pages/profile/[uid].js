@@ -13,12 +13,12 @@ import {
 } from 'shards-react';
 import classNames from 'classnames';
 
-import Error from './_error';
-import AddressListViewer from '../frontend/components/AddressList/AddressListViewer';
-import PageSection from '../frontend/components/PageSection/PageSection';
-import noProfilePic from '../public/static/images/noProfilePic.png';
-import PageQRCode from '../frontend/components/AddressList/QRCode';
-import urls from '../utils/urls';
+import Error from '../_error';
+import AddressListViewer from '../../frontend/components/AddressList/AddressListViewer';
+import PageSection from '../../frontend/components/PageSection/PageSection';
+import noProfilePic from '../../public/static/images/noProfilePic.png';
+import PageQRCode from '../../frontend/components/AddressList/QRCode';
+import urls from '../../utils/urls';
 
 
 const styles = () => ({
