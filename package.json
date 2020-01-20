@@ -22,7 +22,6 @@
     "cryptocurrency-icons": "^0.16.1",
     "firebase": "^7.7.0",
     "lodash": "^4.17.15",
-    "mobile-detect": "^1.4.3",
     "moment": "^2.24.0",
     "multicoin-address-validator": "^0.3.13",
     "next": "^9.2.0",
@@ -33,8 +32,6 @@
     "react-beautiful-dnd": "^12.2.0",
     "react-dom": "^16.12.0",
     "react-select": "3.0.8",
-    "react-virtualized": "^9.21.2",
-    "react-virtualized-select": "^3.1.3",
     "shards-react": "^1.0.3",
     "shards-ui": "^3.0.0",
     "universal-cookie": "^3.1.0"
@@ -46,11 +43,11 @@
     "export": "npm run build && next export"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.15.3",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-react": "^7.12.4"
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.18.0"
   }
 }

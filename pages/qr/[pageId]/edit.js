@@ -6,12 +6,12 @@ import {
     Button, Card, CardBody, CardHeader, CardFooter, Row, Col, Collapse,
     Form, FormGroup, FormInput, FormTextarea, FormFeedback, Alert
 } from 'shards-react';
+import _ from 'lodash';
 import ErrorPage from '../../_error';
 import firebase from '../../../src/firebase';
 import { getPage, updatePage, deletePage } from '../../../src/firebase/actions/pages';
 import AddressListEditor from '../../../src/components/AddressList/AddressListEditor';
 import urls from '../../../utils/urls';
-import _ from 'lodash';
 
 
 const styles = (theme) => ({
@@ -77,8 +77,13 @@ const EditPage = () => {
     React.useEffect(() => {
         if (pageId != null) {
             getPage(pageId)
-                .then((newPage) => setPage(newPage))
-                .catch(() => setInfoLoading(false));
+                .then((newPage) => {
+                    setPage(newPage);
+                    setData(newPage.data);
+                })
+                .catch(() => {
+                    setInfoLoading(false);
+                });
         }
     }, [pageId]);
 
@@ -97,7 +102,7 @@ const EditPage = () => {
     };
 
     const updateAddresses = (addresses) => {
-        if (error.type === 'addresses' && addresses.length > 0) {
+        if (_.get(error, 'type') === 'addresses' && addresses.length > 0) {
             setError(null);
         }
 
@@ -150,7 +155,7 @@ const EditPage = () => {
     };
 
     return (
-        <React.Fragment>
+        <>
             <Collapse open={_.get(error, 'type') === 'general'}>
                 <Alert theme='danger' fade={false}>
                     {_.get(error, 'type') === 'general' && (
@@ -224,7 +229,7 @@ const EditPage = () => {
                     </Row>
                 </Col>
             </Row>
-        </React.Fragment>
+        </>
     );
 };
 

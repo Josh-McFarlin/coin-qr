@@ -444,10 +444,6 @@ export default [
         value: 'DBC'
     },
     {
-        label: 'DeezNuts',
-        value: 'DEEZ'
-    },
-    {
         label: 'Denarius',
         value: 'DNR'
     },

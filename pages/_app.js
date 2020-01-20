@@ -7,8 +7,6 @@ import NavBar from '../src/components/NavBar/NavBar';
 import TermsModal from '../src/components/Terms/TermsModal';
 import 'bootstrap-css-only';
 import 'shards-ui/dist/css/shards.min.css';
-import 'react-virtualized/styles.css';
-import 'react-virtualized-select/styles.css';
 import '../public/static/css/index.css';
 
 

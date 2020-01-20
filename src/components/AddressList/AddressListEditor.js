@@ -6,11 +6,10 @@ import {
 } from 'shards-react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import _ from 'lodash';
-import VirtualizedSelect from 'react-virtualized-select';
+import Select from 'react-select';
 import WAValidator from 'multicoin-address-validator';
-
 import AddressRow from './AddressRow';
-import AvailableCoins from '../../utils/availableCoins';
+import AvailableCoins from '../../../utils/availableCoins';
 
 
 const styles = (theme) => ({
@@ -128,20 +127,19 @@ class AddressListEditor extends React.PureComponent {
         }));
     };
 
-    handleChange = (props) => {
-        const name = _.get(props, 'target.name', 'newCoinType');
+    handleSelectChange = (coinType) => {
+        this.setState({
+            newCoinType: coinType
+        });
+    };
+
+    handleInputChange = (props) => {
         const value = _.get(props, 'target.value', props);
 
-        if (name === 'newAddress') {
-            this.setState((prevState) => ({
-                newAddress: value,
-                ...validateAddress(value, prevState.newCoinType.value)
-            }));
-        } else {
-            this.setState({
-                [name]: value
-            });
-        }
+        this.setState((prevState) => ({
+            newAddress: value,
+            ...validateAddress(value, prevState.newCoinType.value)
+        }));
     };
 
     addAddress = () => {
@@ -254,9 +252,9 @@ class AddressListEditor extends React.PureComponent {
                         <Form>
                             <FormGroup>
                                 <label>Coin Type</label>
-                                <VirtualizedSelect
+                                <Select
                                     options={AvailableCoins}
-                                    onChange={this.handleChange}
+                                    onChange={this.handleSelectChange}
                                     value={newCoinType}
                                 />
                                 <FormFeedback
@@ -275,7 +273,7 @@ class AddressListEditor extends React.PureComponent {
                                     invalid={!newValid}
                                     placeholder='Address'
                                     className='mb-2'
-                                    onChange={this.handleChange}
+                                    onChange={this.handleInputChange}
                                     value={newAddress}
                                 />
                                 <FormFeedback>

@@ -1,21 +1,22 @@
 {
-  "parser": "babel-eslint",
   "env": {
     "browser": true,
-    "es6": true,
-    "commonjs": true
+    "es6": true
   },
-  "extends": "airbnb",
-  "parserOptions": {
-    "ecmaVersion": 9,
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "sourceType": "module"
-  },
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb"
+  ],
   "plugins": [
     "react"
   ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
   "rules": {
     "object-curly-spacing": ["error", "always"],
     "indent": ["error", 4, { "SwitchCase": 1 }],

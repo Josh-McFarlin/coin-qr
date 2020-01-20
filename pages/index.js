@@ -22,6 +22,32 @@ const IndexPage = () => (
                 <Col>
                     <Card>
                         <CardHeader className={classes.header}>
+                            What
+                        </CardHeader>
+                        <CardBody>
+                            <p>
+                                This tool was created after seeing a growing number of artists including
+                                cryptocurrency donation QR codes on their artwork.
+                            </p>
+                            <p>
+                                In order to keep their artwork as clean as possible, most artists limit
+                                their artwork to include only a single donation QR code, but this restricts
+                                donations to only those who own the single cryptocurrency.
+                            </p>
+                            <p>
+                                One of the many use cases this tool enables is allowing artists to provide
+                                a single QR code on their artwork, but accept donations in any number of cryptocurrencies.
+                                And if they later decide to change the receiving address of a wallet, they can easily change
+                                the address online instead of having to paint over the old QR Code.
+                            </p>
+                        </CardBody>
+                    </Card>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <Card>
+                        <CardHeader className={classes.header}>
                             Why
                         </CardHeader>
                         <CardBody>
@@ -56,32 +82,6 @@ const IndexPage = () => (
                                     easily readable QR Codes.
                                 </li>
                             </ul>
-                        </CardBody>
-                    </Card>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <Card>
-                        <CardHeader className={classes.header}>
-                            Why
-                        </CardHeader>
-                        <CardBody>
-                            <p>
-                                This tool was created after seeing a growing number of artists including
-                                cryptocurrency donation QR codes on their artwork.
-                            </p>
-                            <p>
-                                In order to keep their artwork as clean as possible, most artists limit
-                                their artwork to include only a single donation QR code, but this restricts
-                                donations to only those who own the single cryptocurrency.
-                            </p>
-                            <p>
-                                One of the many use cases this tool enables is allowing artists to provide
-                                a single QR code on their artwork, but accept donations in any number of cryptocurrencies.
-                                And if they later decide to change the receiving address of a wallet, they can easily change
-                                the address online instead of having to paint over the old QR Code.
-                            </p>
                         </CardBody>
                     </Card>
                 </Col>
