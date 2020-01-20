@@ -13,7 +13,7 @@ const styles = () => ({
     }
 });
 
-const classes = {}
+const classes = {};
 
 const IndexPage = () => (
     <Row>

@@ -4,17 +4,16 @@ import {
     Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink, Collapse
 } from 'shards-react';
 import _ from 'lodash';
-
 import TermsModal from '../Terms/TermsModal';
 import urls from '../../../utils/urls';
 import { signOut } from '../../firebase/actions';
 import firebase from '../../firebase';
 
 
-const classes = {}
+const classes = {};
 
 const NavBar = () => {
-    const router = useRouter()
+    const router = useRouter();
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [termsOpen, setTermsOpen] = React.useState(false);
     const [userId, setUserId] = React.useState(null);

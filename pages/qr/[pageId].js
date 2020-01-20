@@ -1,5 +1,5 @@
 import React from 'react';
-import Router from 'next/router';
+import { useRouter } from 'next/router';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import isString from 'lodash/isString';
@@ -45,12 +45,17 @@ const styles = (theme) => ({
     }
 });
 
+const classes = {};
+
 const ViewPage = () => {
-    const [page, setPage] = React.useEffect(null);
+    const { query } = useRouter();
+    const [page, setPage] = React.useState(null);
     const [modalOpen, setModalOpen] = React.useState(false);
     const [userId, setUserId] = React.useState(null);
 
-    const { pageId } = Router.query;
+    const isMobile = false;
+
+    const { pageId } = query;
 
     React.useEffect(() => {
         getPage(pageId)

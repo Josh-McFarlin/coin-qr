@@ -1,7 +1,6 @@
 import React from 'react';
-import Router from 'next/router';
+import { useRouter } from 'next/router';
 import set from 'lodash/set';
-import isObject from 'lodash/isObject';
 import isNil from 'lodash/isNil';
 import {
     Button, Card, CardBody, CardHeader, CardFooter, Row, Col, Collapse,
@@ -12,6 +11,7 @@ import firebase from '../../../src/firebase';
 import { getPage, updatePage, deletePage } from '../../../src/firebase/actions/pages';
 import AddressListEditor from '../../../src/components/AddressList/AddressListEditor';
 import urls from '../../../utils/urls';
+import _ from 'lodash';
 
 
 const styles = (theme) => ({
@@ -48,20 +48,23 @@ const styles = (theme) => ({
     }
 });
 
+const classes = {};
+
 const EditPage = () => {
-    const [page, setPage] = React.useEffect(null);
+    const router = useRouter();
+    const [page, setPage] = React.useState(null);
+    const [data, setData] = React.useState({
+        title: '',
+        caption: '',
+        addresses: []
+    });
     const [userId, setUserId] = React.useState(null);
     const [infoLoading, setInfoLoading] = React.useState(true);
-    const [data, setData] = React.useState(null);
     const [error, setError] = React.useState(null);
 
-    const { pageId } = Router.query;
+    const { pageId } = router.query;
 
     React.useEffect(() => {
-        getPage(pageId)
-            .then((newPage) => setPage(newPage))
-            .catch(() => setInfoLoading(false));
-
         firebase.auth()
             .onAuthStateChanged((user) => {
                 setUserId(user.uid);
@@ -70,6 +73,14 @@ const EditPage = () => {
                 setInfoLoading(false);
             });
     }, []);
+
+    React.useEffect(() => {
+        if (pageId != null) {
+            getPage(pageId)
+                .then((newPage) => setPage(newPage))
+                .catch(() => setInfoLoading(false));
+        }
+    }, [pageId]);
 
     if (!infoLoading && (userId == null || page == null)) {
         return (
@@ -98,7 +109,9 @@ const EditPage = () => {
     };
 
     const submitJson = async () => {
-        if (isNil(data.title) || data.title.length === 0) {
+        const title = _.get(data, 'title');
+
+        if (isNil(title) || title.length === 0) {
             setError({
                 type: 'title',
                 message: 'Please provide a title!'
@@ -116,7 +129,7 @@ const EditPage = () => {
         } else {
             await updatePage(pageId, data)
                 .then(() => {
-                    Router.push(urls.qr.view(pageId));
+                    router.push(urls.qr.view(pageId));
                 })
                 .catch(() => {
                     setError({
@@ -128,19 +141,19 @@ const EditPage = () => {
     };
 
     const handleDelete = async () => {
-        const conf = Window.confirm('Are you sure you want to delete this page?');
+        const conf = window.confirm('Are you sure you want to delete this page?');
 
         if (conf === true) {
             await deletePage(pageId)
-                .then(() => Router.push(urls.home()));
+                .then(() => router.push(urls.home()));
         }
     };
 
     return (
         <React.Fragment>
-            <Collapse open={isObject(error)}>
+            <Collapse open={_.get(error, 'type') === 'general'}>
                 <Alert theme='danger' fade={false}>
-                    {error.type === 'general' && (
+                    {_.get(error, 'type') === 'general' && (
                         error.message
                     )}
                 </Alert>
@@ -161,7 +174,7 @@ const EditPage = () => {
                                                 id='title'
                                                 onChange={handleChange}
                                                 value={data.title}
-                                                invalid={error.type === 'title' || data.title.length > 50}
+                                                invalid={_.get(error, 'type') === 'title' || data.title.length > 50}
                                             />
                                             <FormFeedback>
                                                 Please provide a title no longer than 50 characters in length.
@@ -176,7 +189,7 @@ const EditPage = () => {
                                                 invalid={data.caption.length > 200}
                                             />
                                             <FormFeedback>
-                                                Please provide a title no longer than 200 characters in length.
+                                                Please provide a caption no longer than 200 characters in length.
                                             </FormFeedback>
                                         </FormGroup>
                                     </Form>

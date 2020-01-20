@@ -1,7 +1,6 @@
 import React from 'react';
 import Router from 'next/router';
 import set from 'lodash/set';
-import isObject from 'lodash/isObject';
 import isNil from 'lodash/isNil';
 import {
     Card,
@@ -15,10 +14,11 @@ import {
     Form,
     FormGroup, FormInput, FormFeedback, FormTextarea, CardFooter
 } from 'shards-react';
-import { addPage, getPage } from '../src/firebase/actions/pages';
+import { addPage } from '../src/firebase/actions/pages';
 import AddressListEditor from '../src/components/AddressList/AddressListEditor';
 import urls from '../utils/urls';
 import firebase from '../src/firebase';
+import _ from 'lodash';
 
 
 const styles = (theme) => ({
@@ -55,6 +55,8 @@ const styles = (theme) => ({
     }
 });
 
+const classes = {};
+
 const CreatePage = () => {
     const [data, setData] = React.useState({
         title: '',
@@ -83,7 +85,7 @@ const CreatePage = () => {
     };
 
     const updateAddresses = (addresses) => {
-        if (error.type === 'addresses' && addresses.length > 0) {
+        if (_.get(error, 'type') === 'addresses' && addresses.length > 0) {
             setError(null);
         }
 
@@ -126,9 +128,9 @@ const CreatePage = () => {
 
     return (
         <React.Fragment>
-            <Collapse open={isObject(error)}>
+            <Collapse open={_.get(error, 'type') === 'general'}>
                 <Alert theme='danger' fade={false}>
-                    {error.type === 'general' && (
+                    {_.get(error, 'type') === 'general' && (
                         error.message
                     )}
                 </Alert>
@@ -149,7 +151,7 @@ const CreatePage = () => {
                                                 id='title'
                                                 onChange={handleChange}
                                                 value={data.title}
-                                                invalid={error.type === 'title' || data.title.length > 50}
+                                                invalid={_.get(error, 'type') === 'title' || data.title.length > 50}
                                             />
                                             <FormFeedback>
                                                 Please provide a title no longer than 50 characters in length.
